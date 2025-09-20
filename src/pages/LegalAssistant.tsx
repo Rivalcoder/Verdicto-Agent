@@ -134,21 +134,23 @@ const LegalAssistant = () => {
   };
 
   return (
-    <div className="h-screen flex bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
-      {/* Sidebar */}
-      <ChatSidebar />
+    <div className="h-screen flex bg-background overflow-hidden">
+      {/* Right Sidebar - Chat History */}
+      <div className="w-80 flex flex-col h-full bg-card border-l-2 border-border shadow-lg">
+        <ChatSidebar />
+      </div>
       
       {/* Main Chat Interface */}
-      <div className="flex-1 flex flex-col min-h-0">
+      <div className="flex-1 flex flex-col h-full">
         {/* Header */}
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+        <div className="p-4 border-b border-border bg-card/50 backdrop-blur-sm flex-shrink-0">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <h1 className="text-xl font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent">
+              <h1 className="text-xl font-bold text-foreground">
                 Virtual Legal Assistant
               </h1>
               <p className="text-sm text-muted-foreground">
-                24/7 AI-powered legal assistance for research, drafting, and client support
+                24/7 AI-powered legal assistance
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -157,10 +159,11 @@ const LegalAssistant = () => {
             </div>
           </div>
         </div>
+        
         {/* Chat Messages Area */}
-        <div className="flex-1 overflow-hidden">
-          <ScrollArea className="h-full px-6 py-4 chat-scroll">
-            <div className="space-y-6">
+        <div className="flex-1 overflow-hidden bg-muted/20">
+          <ScrollArea className="h-full">
+            <div className="px-4 py-4 space-y-4">
               {messages.map((msg, index) => (
                 <div 
                   key={msg.id} 
@@ -170,7 +173,7 @@ const LegalAssistant = () => {
                   <div className={`flex gap-3 max-w-[85%] ${msg.type === 'user' ? 'flex-row-reverse' : ''}`}>
                     {msg.type === 'assistant' && (
                       <Avatar className="h-8 w-8 mt-1 flex-shrink-0">
-                        <AvatarFallback className="bg-gradient-primary text-white">
+                        <AvatarFallback className="bg-primary text-primary-foreground">
                           <Bot className="h-4 w-4" />
                         </AvatarFallback>
                       </Avatar>
@@ -178,8 +181,8 @@ const LegalAssistant = () => {
                     <div className={`group relative ${msg.type === 'user' ? 'flex-row-reverse' : ''}`}>
                       <div className={`rounded-2xl p-4 shadow-sm transition-all duration-300 hover:shadow-md ${
                         msg.type === 'user' 
-                          ? 'bg-primary text-primary-foreground ml-auto message-bubble-user' 
-                          : 'bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 message-bubble'
+                          ? 'bg-primary text-primary-foreground ml-auto' 
+                          : 'bg-card border border-border'
                       }`}>
                         <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                         <div className={`flex items-center justify-between mt-2 ${
@@ -191,7 +194,7 @@ const LegalAssistant = () => {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className="h-6 w-6 p-0 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                className="h-6 w-6 p-0 hover:bg-muted"
                                 onClick={() => handleCopy(msg.content)}
                               >
                                 <Copy className="h-3 w-3" />
@@ -199,7 +202,7 @@ const LegalAssistant = () => {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className={`h-6 w-6 p-0 hover:bg-gray-100 dark:hover:bg-gray-700 ${msg.isLiked ? 'text-green-600' : ''}`}
+                                className={`h-6 w-6 p-0 hover:bg-muted ${msg.isLiked ? 'text-green-600' : ''}`}
                                 onClick={() => handleLike(msg.id)}
                               >
                                 <ThumbsUp className="h-3 w-3" />
@@ -207,7 +210,7 @@ const LegalAssistant = () => {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                className={`h-6 w-6 p-0 hover:bg-gray-100 dark:hover:bg-gray-700 ${msg.isDisliked ? 'text-red-600' : ''}`}
+                                className={`h-6 w-6 p-0 hover:bg-muted ${msg.isDisliked ? 'text-red-600' : ''}`}
                                 onClick={() => handleDislike(msg.id)}
                               >
                                 <ThumbsDown className="h-3 w-3" />
@@ -219,7 +222,7 @@ const LegalAssistant = () => {
                     </div>
                     {msg.type === 'user' && (
                       <Avatar className="h-8 w-8 mt-1 flex-shrink-0">
-                        <AvatarFallback className="bg-gradient-secondary text-white">
+                        <AvatarFallback className="bg-secondary text-secondary-foreground">
                           <User className="h-4 w-4" />
                         </AvatarFallback>
                       </Avatar>
@@ -230,15 +233,15 @@ const LegalAssistant = () => {
               {isTyping && (
                 <div className="flex gap-3 justify-start animate-message-slide-in">
                   <Avatar className="h-8 w-8 mt-1">
-                    <AvatarFallback className="bg-gradient-primary text-white">
+                    <AvatarFallback className="bg-primary text-primary-foreground">
                       <Bot className="h-4 w-4" />
                     </AvatarFallback>
                   </Avatar>
-                  <div className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-4 message-bubble">
+                  <div className="bg-card border border-border rounded-2xl p-4">
                     <div className="flex items-center gap-1">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full typing-dot"></div>
-                      <div className="w-2 h-2 bg-blue-500 rounded-full typing-dot"></div>
-                      <div className="w-2 h-2 bg-blue-500 rounded-full typing-dot"></div>
+                      <div className="w-2 h-2 bg-primary rounded-full typing-dot"></div>
+                      <div className="w-2 h-2 bg-primary rounded-full typing-dot"></div>
+                      <div className="w-2 h-2 bg-primary rounded-full typing-dot"></div>
                     </div>
                   </div>
                 </div>
@@ -249,7 +252,7 @@ const LegalAssistant = () => {
         </div>
         
         {/* Input Area - Fixed at bottom */}
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm shadow-lg">
+        <div className="p-4 border-t border-border bg-card/50 backdrop-blur-sm flex-shrink-0">
           <div className="flex items-end gap-3">
             <div className="flex-1 relative">
               <Textarea
@@ -258,21 +261,21 @@ const LegalAssistant = () => {
                 value={message}
                 onChange={handleTextareaChange}
                 onKeyDown={handleKeyPress}
-                className="chat-input min-h-[44px] max-h-32 resize-none pr-12 border-gray-300 dark:border-gray-600 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                className="min-h-[44px] max-h-32 resize-none pr-12 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
                 rows={1}
               />
               <div className="absolute right-2 bottom-2 flex items-center gap-1">
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-6 w-6 p-0 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  className="h-6 w-6 p-0 hover:bg-muted transition-colors"
                 >
                   <Paperclip className="h-4 w-4" />
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-6 w-6 p-0 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                  className="h-6 w-6 p-0 hover:bg-muted transition-colors"
                 >
                   <Smile className="h-4 w-4" />
                 </Button>
@@ -283,21 +286,14 @@ const LegalAssistant = () => {
                 variant="outline"
                 size="sm"
                 onClick={toggleRecording}
-                className={`h-10 w-10 rounded-full transition-all duration-200 ${isRecording ? "bg-red-100 text-red-600 border-red-200 hover:bg-red-200 animate-pulse" : "hover:bg-gray-100 dark:hover:bg-gray-700"}`}
+                className={`h-10 w-10 rounded-full transition-all duration-200 ${isRecording ? "bg-red-100 text-red-600 border-red-200 hover:bg-red-200 animate-pulse" : "hover:bg-muted"}`}
               >
                 {isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
               </Button>
               <Button 
                 onClick={handleSendMessage} 
                 disabled={!message.trim()}
-                className="h-10 w-10 rounded-full bg-gradient-primary hover:opacity-90 disabled:opacity-50 transition-all duration-200 hover:scale-105"
-                onMouseDown={() => {
-                  if (message.trim()) {
-                    const button = document.querySelector('.send-button');
-                    button?.classList.add('animate-send-button-pulse');
-                    setTimeout(() => button?.classList.remove('animate-send-button-pulse'), 600);
-                  }
-                }}
+                className="h-10 w-10 rounded-full bg-primary hover:bg-primary/90 disabled:opacity-50 transition-all duration-200 hover:scale-105"
               >
                 <Send className="h-4 w-4" />
               </Button>

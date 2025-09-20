@@ -131,9 +131,7 @@
     --sidebar-border: 225 15% 15%;
     --sidebar-ring: 225 73% 60%;
   }
-}
 
-@layer base {
   * {
     @apply border-border;
   }
@@ -734,7 +732,90 @@
   /* Message hover effects */
   .message-bubble:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Sidebar animations */
+  @keyframes slideInFromRight {
+    0% {
+      opacity: 0;
+      transform: translateX(100px) scale(0.95);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+  }
+
+  @keyframes slideInFromLeft {
+    0% {
+      opacity: 0;
+      transform: translateX(-100px) scale(0.95);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+    }
+  }
+
+  @keyframes curveSlideIn {
+    0% {
+      opacity: 0;
+      transform: translateX(50px) rotateY(-15deg) scale(0.9);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0) rotateY(0deg) scale(1);
+    }
+  }
+
+  .animate-slide-in-right {
+    animation: slideInFromRight 0.6s ease-out forwards;
+  }
+
+  .animate-slide-in-left {
+    animation: slideInFromLeft 0.6s ease-out forwards;
+  }
+
+  .animate-curve-slide-in {
+    animation: curveSlideIn 0.8s ease-out forwards;
+  }
+
+  /* Curved sidebar styling */
+  .sidebar-curved {
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.9) 0%, 
+      rgba(248, 250, 252, 0.8) 50%, 
+      rgba(239, 246, 255, 0.9) 100%);
+    backdrop-filter: blur(20px);
+    border-radius: 24px 0 0 24px;
+    box-shadow: 
+      -10px 0 30px -10px rgba(0, 0, 0, 0.1),
+      inset 1px 0 0 rgba(255, 255, 255, 0.2);
+  }
+
+  .dark .sidebar-curved {
+    background: linear-gradient(135deg, 
+      rgba(30, 41, 59, 0.9) 0%, 
+      rgba(51, 65, 85, 0.8) 50%, 
+      rgba(30, 58, 138, 0.9) 100%);
+    box-shadow: 
+      -10px 0 30px -10px rgba(0, 0, 0, 0.3),
+      inset 1px 0 0 rgba(255, 255, 255, 0.1);
+  }
+
+  /* Line clamp utilities */
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   .message-bubble-user:hover {
