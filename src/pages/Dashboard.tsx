@@ -6,8 +6,6 @@ import {
   FileSearch, 
   MessageSquare, 
   TrendingUp, 
-  BarChart3,
-  Users,
   Calendar,
   AlertTriangle,
   CheckCircle,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,22 +17,18 @@ import {
   Settings as SettingsIcon, 
   Bell, 
   User, 
-  Shield, 
-  Globe, 
-  Palette,
   Check,
   X,
   AlertCircle,
   Info,
   CheckCircle,
-  Upload,
   Camera
 } from 'lucide-react';
 
 interface Profile {
-  display_name: string;
-  bio: string;
-  avatar_url: string;
+  display_name: string | null;
+  bio: string | null;
+  avatar_url: string | null;
 }
 
 interface UserSettings {
@@ -68,15 +64,7 @@ export default function Settings() {
   });
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
-  useEffect(() => {
-    if (user) {
-      fetchProfile();
-      fetchSettings();
-      fetchNotifications();
-    }
-  }, [user]);
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     if (!user) return;
     
     const { data, error } = await supabase
@@ -88,9 +76,9 @@ export default function Settings() {
     if (data && !error) {
       setProfile(data);
     }
-  };
+  }, [user]);
 
-  const fetchSettings = async () => {
+  const fetchSettings = useCallback(async () => {
     if (!user) return;
     
     const { data, error } = await supabase
@@ -102,9 +90,9 @@ export default function Settings() {
     if (data && !error) {
       setSettings(data);
     }
-  };
+  }, [user]);
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = useCallback(async () => {
     if (!user) return;
     
     const { data, error } = await supabase
@@ -116,7 +104,15 @@ export default function Settings() {
     if (data && !error) {
       setNotifications(data as Notification[]);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      fetchProfile();
+      fetchSettings();
+      fetchNotifications();
+    }
+  }, [user, fetchProfile, fetchSettings, fetchNotifications]);
 
   const saveProfile = async () => {
     if (!user) return;
@@ -293,11 +289,12 @@ export default function Settings() {
         title: "Profile Image Updated",
         description: "Your profile image has been successfully uploaded to Supabase storage.",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Upload error:', error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to upload image. Please try again.";
       toast({
         title: "Upload Failed",
-        description: error.message || "Failed to upload image. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -348,7 +345,7 @@ export default function Settings() {
               <Label>Profile Image</Label>
               <div className="flex items-center gap-4">
                 <Avatar className="h-20 w-20">
-                  <AvatarImage src={profile.avatar_url} alt="Profile" />
+                  <AvatarImage src={profile.avatar_url || undefined} alt="Profile" />
                   <AvatarFallback className="bg-primary text-primary-foreground text-lg font-semibold">
                     {user ? getUserInitials(user.email || 'U') : 'U'}
                   </AvatarFallback>
@@ -382,7 +379,7 @@ export default function Settings() {
               <Label htmlFor="displayName">Display Name</Label>
               <Input
                 id="displayName"
-                value={profile.display_name}
+                value={profile.display_name || ''}
                 onChange={(e) => setProfile({ ...profile, display_name: e.target.value })}
                 placeholder="Your display name"
               />

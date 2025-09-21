@@ -10,9 +10,6 @@ import {
   Clock,
   Users,
   Search,
-  FileText,
-  Scale,
-  Bot,
   BarChart3,
   ArrowRight
 } from "lucide-react";
@@ -92,7 +89,7 @@ const FeaturesSection = () => {
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
             Transform your legal practice with cutting-edge AI technology designed specifically 
-            for the legal industry's unique challenges and requirements.
+            for the legal industry&apos;s unique challenges and requirements.
           </p>
         </div>
 

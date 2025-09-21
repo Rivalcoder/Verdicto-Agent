@@ -1313,4 +1313,40 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   }
+
+  /* Animated divider line between chat and history */
+  @keyframes divider-flow {
+    0% {
+      background-position: 0% 0%;
+    }
+    100% {
+      background-position: 0% 100%;
+    }
+  }
+
+  @keyframes divider-glow {
+    0%, 100% {
+      box-shadow: 0 0 5px rgba(59, 130, 246, 0.3);
+    }
+    50% {
+      box-shadow: 0 0 20px rgba(59, 130, 246, 0.6), 0 0 30px rgba(139, 92, 246, 0.4);
+    }
+  }
+
+  .divider-line {
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      hsl(var(--primary)) 20%,
+      hsl(var(--secondary)) 50%,
+      hsl(var(--primary)) 80%,
+      transparent 100%
+    );
+    background-size: 100% 200%;
+    animation: divider-flow 3s ease-in-out infinite;
+  }
+
+  .divider-glow {
+    animation: divider-glow 2s ease-in-out infinite;
+  }
 }

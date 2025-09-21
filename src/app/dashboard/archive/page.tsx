@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Archive, Search, Filter, Download, Eye, Trash2, RotateCcw } from "lucide-react";
+import { Archive, Search, Filter, Download, Eye, RotateCcw } from "lucide-react";
 
 export default function ArchivePage() {
   const [searchTerm, setSearchTerm] = useState("");

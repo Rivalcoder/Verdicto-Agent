@@ -1,13 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, MapPin, Users, Plus, Filter } from "lucide-react";
 
 export default function CalendarPage() {
-  const [selectedDate, setSelectedDate] = useState(new Date());
 
   const events = [
     {
@@ -61,7 +59,7 @@ export default function CalendarPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Calendar className="h-5 w-5" />
-                Today's Schedule
+                Today&apos;s Schedule
               </CardTitle>
               <CardDescription>
                 {new Date().toLocaleDateString('en-US', { 

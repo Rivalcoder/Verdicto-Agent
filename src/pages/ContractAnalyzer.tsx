@@ -4,13 +4,12 @@ import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { FileSearch, Upload, AlertTriangle, CheckCircle, Clock, TrendingUp, X } from "lucide-react";
-import { apiService, type ContractAnalysisResponse, type ContractClause, type ContractRisk } from "@/services/api";
+import { apiService, type ContractAnalysisResponse } from "@/services/api";
 
 const ContractAnalyzer = () => {
   const [analysisProgress, setAnalysisProgress] = useState(0);
@@ -26,7 +25,7 @@ const ContractAnalyzer = () => {
       await apiService.checkHealth();
       setIsHealthCheckPassed(true);
       setError(null);
-    } catch (err) {
+    } catch {
       setIsHealthCheckPassed(false);
       setError('Service is currently unavailable. Please try again later.');
     }
@@ -79,8 +78,8 @@ const ContractAnalyzer = () => {
       const result = await apiService.analyzeContract(selectedFile);
       setAnalysisResult(result);
       setAnalysisProgress(100);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred during analysis');
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'An error occurred during analysis');
       setAnalysisProgress(0);
     } finally {
       clearInterval(progressInterval);

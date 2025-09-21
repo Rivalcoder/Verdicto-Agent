@@ -7,9 +7,6 @@ import {
   Scale, 
   FileSearch, 
   MessageSquare, 
-  TrendingUp, 
-  Clock,
-  CheckCircle,
   ArrowRight
 } from 'lucide-react';
 
@@ -59,12 +56,6 @@ const AnimatedFeatures = () => {
     }
   ];
 
-  const stats = [
-    { number: "10M+", label: "Documents Processed", icon: FileSearch },
-    { number: "99.9%", label: "Accuracy Rate", icon: CheckCircle },
-    { number: "2.5s", label: "Average Response", icon: Clock },
-    { number: "500+", label: "Law Firms", icon: Scale }
-  ];
 
   return (
     <div className="py-20 px-4 relative overflow-hidden">
@@ -87,7 +78,7 @@ const AnimatedFeatures = () => {
 
         {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
-          {features.map((feature, index) => (
+          {features.map((feature) => (
             <div
               key={feature.title}
               className="group relative p-8 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:shadow-2xl transition-all duration-300 hover:scale-105 hover:-translate-y-2"

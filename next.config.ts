@@ -5,9 +5,6 @@ const nextConfig: NextConfig = {
     domains: ['localhost'],
     unoptimized: true, // For development
   },
-  experimental: {
-    optimizePackageImports: ['lucide-react'],
-  },
 };
 
 export default nextConfig;

@@ -124,7 +124,7 @@ const AnimatedCTA = () => {
             
             <p className="text-2xl text-white/80 max-w-4xl mx-auto leading-relaxed mb-12">
               See these metrics in your own dashboard. Experience the power of AI-driven legal technology 
-              that's revolutionizing how law firms operate worldwide.
+              that&apos;s revolutionizing how law firms operate worldwide.
             </p>
           </div>
 

@@ -27,7 +27,7 @@ const AnimatedIntro = () => {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [texts.length]);
 
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -104,7 +104,7 @@ const AnimatedIntro = () => {
 
         {/* Feature Pills */}
         <div className="flex flex-wrap justify-center gap-4 mb-12">
-          {features.map((feature, index) => (
+          {features.map((feature) => (
             <div
               key={feature.text}
               className="flex items-center gap-2 px-6 py-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:scale-105 hover:shadow-xl transition-all duration-300"

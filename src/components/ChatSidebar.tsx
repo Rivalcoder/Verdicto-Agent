@@ -1,17 +1,15 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { 
-  MessageSquare, 
   Plus, 
   Search, 
   Clock, 
   Star, 
-  Trash2, 
   MoreVertical,
   Bot,
   User,
@@ -90,10 +88,6 @@ const ChatSidebar = () => {
     }
   ];
 
-  const filteredChats = chatHistory.filter(chat =>
-    chat.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    chat.lastMessage.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   const starredChats = chatHistory.filter(chat => chat.isStarred);
   const recentChats = chatHistory.filter(chat => !chat.isStarred);
@@ -206,7 +200,7 @@ const ChatSidebar = () => {
               <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
                 Recent
               </h3>
-              {recentChats.map((chat, index) => (
+              {recentChats.map((chat) => (
                 <Card
                   key={chat.id}
                   className={`group cursor-pointer max-w-72 transition-all duration-300 hover:shadow-md ${

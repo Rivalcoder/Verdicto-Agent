@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
@@ -28,25 +28,7 @@ export default function DashboardLayout({
   const { signOut, user } = useAuth();
   const [unreadNotifications, setUnreadNotifications] = useState(0);
 
-  useEffect(() => {
-    if (user) {
-      fetchUnreadNotifications();
-    }
-  }, [user]);
-
-  // Listen for notification read events
-  useEffect(() => {
-    const handleNotificationRead = () => {
-      fetchUnreadNotifications();
-    };
-
-    window.addEventListener('notificationRead', handleNotificationRead);
-    return () => {
-      window.removeEventListener('notificationRead', handleNotificationRead);
-    };
-  }, [user]);
-
-  const fetchUnreadNotifications = async () => {
+  const fetchUnreadNotifications = useCallback(async () => {
     if (!user) return;
     
     const { data, error } = await supabase
@@ -58,7 +40,25 @@ export default function DashboardLayout({
     if (data && !error) {
       setUnreadNotifications(data.length);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      fetchUnreadNotifications();
+    }
+  }, [user, fetchUnreadNotifications]);
+
+  // Listen for notification read events
+  useEffect(() => {
+    const handleNotificationRead = () => {
+      fetchUnreadNotifications();
+    };
+
+    window.addEventListener('notificationRead', handleNotificationRead);
+    return () => {
+      window.removeEventListener('notificationRead', handleNotificationRead);
+    };
+  }, [fetchUnreadNotifications]);
 
   const handleSignOut = async () => {
     await signOut();

@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Upload, Search, Filter, Download, Eye, Trash2, FolderOpen } from "lucide-react";
+import { FileText, Upload, Search, Filter, Download, Eye, Trash2 } from "lucide-react";
 
 export default function DocumentsPage() {
   const [searchTerm, setSearchTerm] = useState("");

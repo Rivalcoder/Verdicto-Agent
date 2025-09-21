@@ -90,7 +90,7 @@ const PlatformModules = () => {
 
         {/* Main Modules */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
-          {modules.map((module, index) => {
+          {modules.map((module) => {
             const IconComponent = module.icon;
             return (
               <Card key={module.id} className="relative p-8 bg-gradient-card shadow-card hover:shadow-elegant transition-smooth group cursor-pointer overflow-hidden">
@@ -137,10 +137,10 @@ const PlatformModules = () => {
 
         {/* Additional Features */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {additionalFeatures.map((feature, index) => {
+          {additionalFeatures.map((feature) => {
             const IconComponent = feature.icon;
             return (
-              <div key={index} className="flex items-start gap-4 p-6 bg-card rounded-xl shadow-card">
+              <div key={feature.title} className="flex items-start gap-4 p-6 bg-card rounded-xl shadow-card">
                 <div className="p-3 bg-gradient-primary rounded-xl flex-shrink-0">
                   <IconComponent className="h-6 w-6 text-white" />
                 </div>

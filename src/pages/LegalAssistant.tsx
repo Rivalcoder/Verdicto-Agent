@@ -2,20 +2,16 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
-import { MessageSquare, Send, Bot, User, Clock, Calendar, Phone, Mail, Mic, MicOff, Paperclip, Smile, MoreVertical, Star, Copy, ThumbsUp, ThumbsDown } from "lucide-react";
+import { Send, Bot, User, Mic, MicOff, Paperclip, Smile, Copy, ThumbsUp, ThumbsDown } from "lucide-react";
 import ChatSidebar from "@/components/ChatSidebar";
 
 const LegalAssistant = () => {
   const [message, setMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   
@@ -129,16 +125,16 @@ const LegalAssistant = () => {
     setIsRecording(!isRecording);
   };
 
-  const toggleExpanded = () => {
-    setIsExpanded(!isExpanded);
-  };
 
   return (
-    <div className="h-screen flex bg-background overflow-hidden">
+    <div className="h-screen flex bg-background overflow-hidden relative">
       {/* Right Sidebar - Chat History */}
-      <div className="w-80 flex flex-col h-full bg-card border-l-2 border-border shadow-lg">
+      <div className="w-80 flex flex-col h-full bg-card shadow-lg">
         <ChatSidebar />
       </div>
+      
+      {/* Animated Divider Line - Between Chat and History */}
+      <div className="absolute left-80 top-0 bottom-0 w-1 divider-line divider-glow z-10"></div>
       
       {/* Main Chat Interface */}
       <div className="flex-1 flex flex-col h-full">

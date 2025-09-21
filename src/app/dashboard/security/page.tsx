@@ -172,7 +172,7 @@ export default function SecurityPage() {
               {twoFactorEnabled && (
                 <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
                   <p className="text-sm text-green-800 dark:text-green-200">
-                    Two-factor authentication is now enabled. You'll need to verify your identity when signing in.
+                    Two-factor authentication is now enabled. You&apos;ll need to verify your identity when signing in.
                   </p>
                 </div>
               )}
@@ -230,7 +230,7 @@ export default function SecurityPage() {
               Recent Security Activity
             </CardTitle>
             <CardDescription>
-              Monitor your account's security events and stay informed
+              Monitor your account&apos;s security events and stay informed
             </CardDescription>
           </CardHeader>
           <CardContent className="p-6">

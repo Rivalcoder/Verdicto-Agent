@@ -21,7 +21,7 @@ interface Metric {
   value: string;
   label: string;
   change: string;
-  icon: React.ComponentType<any>;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   color: string;
   gradient: string;
   position: { x: number; y: number };
@@ -33,24 +33,24 @@ const AnimatedMetrics = () => {
   const [hoveredMetric, setHoveredMetric] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(false);
 
-  const metricData: Omit<Metric, 'position' | 'size'>[] = [
-    { id: 'docs', value: "2,847", label: "Documents Processed", change: "+23%", icon: Database, color: "text-blue-500", gradient: "from-blue-500 to-cyan-500" },
-    { id: 'risks', value: "127", label: "Risk Issues Found", change: "+15%", icon: Shield, color: "text-red-500", gradient: "from-red-500 to-pink-500" },
-    { id: 'time', value: "89%", label: "Time Saved", change: "+12%", icon: Clock, color: "text-green-500", gradient: "from-green-500 to-emerald-500" },
-    { id: 'accuracy', value: "98%", label: "Accuracy Rate", change: "+5%", icon: Target, color: "text-purple-500", gradient: "from-purple-500 to-violet-500" },
-    { id: 'cases', value: "1,234", label: "Cases Analyzed", change: "+18%", icon: Brain, color: "text-indigo-500", gradient: "from-indigo-500 to-blue-500" },
-    { id: 'prediction', value: "85%", label: "Prediction Accuracy", change: "+8%", icon: TrendingUp, color: "text-orange-500", gradient: "from-orange-500 to-red-500" },
-    { id: 'settlement', value: "92%", label: "Settlement Success", change: "+14%", icon: Award, color: "text-emerald-500", gradient: "from-emerald-500 to-green-500" },
-    { id: 'resolution', value: "67%", label: "Time to Resolution", change: "+22%", icon: Zap, color: "text-yellow-500", gradient: "from-yellow-500 to-orange-500" },
-    { id: 'queries', value: "15,678", label: "Queries Handled", change: "+31%", icon: Users, color: "text-pink-500", gradient: "from-pink-500 to-rose-500" },
-    { id: 'response', value: "2.3s", label: "Response Time", change: "-45%", icon: Clock, color: "text-cyan-500", gradient: "from-cyan-500 to-blue-500" },
-    { id: 'satisfaction', value: "96%", label: "Client Satisfaction", change: "+12%", icon: Star, color: "text-violet-500", gradient: "from-violet-500 to-purple-500" },
-    { id: 'languages', value: "90+", label: "Languages Supported", change: "+8%", icon: Globe, color: "text-teal-500", gradient: "from-teal-500 to-cyan-500" }
-  ];
-
   useEffect(() => {
+    const metricData: Omit<Metric, 'position' | 'size'>[] = [
+      { id: 'docs', value: "2,847", label: "Documents Processed", change: "+23%", icon: Database, color: "text-blue-500", gradient: "from-blue-500 to-cyan-500" },
+      { id: 'risks', value: "127", label: "Risk Issues Found", change: "+15%", icon: Shield, color: "text-red-500", gradient: "from-red-500 to-pink-500" },
+      { id: 'time', value: "89%", label: "Time Saved", change: "+12%", icon: Clock, color: "text-green-500", gradient: "from-green-500 to-emerald-500" },
+      { id: 'accuracy', value: "98%", label: "Accuracy Rate", change: "+5%", icon: Target, color: "text-purple-500", gradient: "from-purple-500 to-violet-500" },
+      { id: 'cases', value: "1,234", label: "Cases Analyzed", change: "+18%", icon: Brain, color: "text-indigo-500", gradient: "from-indigo-500 to-blue-500" },
+      { id: 'prediction', value: "85%", label: "Prediction Accuracy", change: "+8%", icon: TrendingUp, color: "text-orange-500", gradient: "from-orange-500 to-red-500" },
+      { id: 'settlement', value: "92%", label: "Settlement Success", change: "+14%", icon: Award, color: "text-emerald-500", gradient: "from-emerald-500 to-green-500" },
+      { id: 'resolution', value: "67%", label: "Time to Resolution", change: "+22%", icon: Zap, color: "text-yellow-500", gradient: "from-yellow-500 to-orange-500" },
+      { id: 'queries', value: "15,678", label: "Queries Handled", change: "+31%", icon: Users, color: "text-pink-500", gradient: "from-pink-500 to-rose-500" },
+      { id: 'response', value: "2.3s", label: "Response Time", change: "-45%", icon: Clock, color: "text-cyan-500", gradient: "from-cyan-500 to-blue-500" },
+      { id: 'satisfaction', value: "96%", label: "Client Satisfaction", change: "+12%", icon: Star, color: "text-violet-500", gradient: "from-violet-500 to-purple-500" },
+      { id: 'languages', value: "90+", label: "Languages Supported", change: "+8%", icon: Globe, color: "text-teal-500", gradient: "from-teal-500 to-cyan-500" }
+    ];
+
     // Generate random positions for floating metrics
-    const positionedMetrics = metricData.map((metric, index) => ({
+    const positionedMetrics = metricData.map((metric) => ({
       ...metric,
       position: {
         x: Math.random() * 80 + 10, // 10% to 90% of container width
@@ -78,9 +78,6 @@ const AnimatedMetrics = () => {
     }
   };
 
-  const getPulseDelay = (index: number) => {
-    return `${index * 0.2}s`;
-  };
 
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-hidden">

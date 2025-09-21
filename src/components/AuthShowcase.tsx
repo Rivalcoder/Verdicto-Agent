@@ -5,7 +5,6 @@ import { Scale, Shield, Zap, Brain, CheckCircle, ArrowRight, Sparkles, Users, Cl
 
 const AuthShowcase = () => {
   const [currentFeature, setCurrentFeature] = useState(0);
-  const [isVisible, setIsVisible] = useState(true);
 
   const features = [
     {
@@ -47,7 +46,7 @@ const AuthShowcase = () => {
     }, 4000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [features.length]);
 
   return (
     <div className="relative h-full flex flex-col justify-center px-8 lg:px-12">

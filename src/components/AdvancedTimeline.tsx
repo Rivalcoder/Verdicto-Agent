@@ -8,13 +8,10 @@ import {
   Brain, 
   Zap, 
   Shield, 
-  Clock,
   ArrowRight,
   Sparkles,
   TrendingUp,
-  Lock,
   Globe,
-  Cpu,
   Play,
   BarChart3,
   Star
@@ -25,7 +22,7 @@ interface TimelineItem {
   title: string;
   description: string;
   emoji: string;
-  icon: React.ComponentType<any>;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   color: string;
   gradient: string;
   features: string[];
@@ -294,7 +291,7 @@ export function AdvancedTimeline() {
                 
                 <p className="text-xl text-white/80 leading-relaxed max-w-3xl mx-auto">
                   See these metrics in your own dashboard. Experience the power of AI-driven legal technology 
-                  that's revolutionizing how law firms operate worldwide.
+                  that&apos;s revolutionizing how law firms operate worldwide.
                 </p>
                 
                 <div className="flex flex-col sm:flex-row gap-6 justify-center items-center pt-4">

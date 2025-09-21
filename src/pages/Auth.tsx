@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import Navigation from '@/components/Navigation';
-import { HexagonBackground } from '@/components/HexagonBackground';
 import AnimatedAuthBackground from '@/components/AnimatedAuthBackground';
 import AuthShowcase from '@/components/AuthShowcase';
 import AnimatedAuthForm from '@/components/AnimatedAuthForm';
@@ -45,11 +44,10 @@ export default function Auth() {
       <div className="min-h-screen flex">
         {/* Left Side - Showcase (Hidden on mobile) */}
         <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-          {/* Dark mode gets hexagons, light mode gets animated background */}
+          {/* Dark mode gets animated background */}
           <div className="dark:block hidden w-full h-full">
-            <HexagonBackground className="w-full h-full">
-              <AuthShowcase />
-            </HexagonBackground>
+            <AnimatedAuthBackground isDark={true} />
+            <AuthShowcase />
           </div>
           
           {/* Light mode gets animated background */}

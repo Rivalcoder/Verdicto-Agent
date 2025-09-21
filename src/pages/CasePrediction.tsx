@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { TrendingUp, Target, Brain, BarChart3, Scale, Clock, DollarSign, Upload, FileText, AlertCircle, CheckCircle } from "lucide-react";
+import { TrendingUp, Target, Brain, BarChart3, Scale, DollarSign, Upload, FileText, AlertCircle, CheckCircle } from "lucide-react";
 import { apiService, type CasePredictionResponse } from "@/services/api";
 import { useToast } from "@/hooks/use-toast";
 
@@ -17,7 +17,6 @@ const CasePrediction = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [caseDetails, setCaseDetails] = useState("");
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [extractedText, setExtractedText] = useState("");
   const [isExtracting, setIsExtracting] = useState(false);
   const [predictionResult, setPredictionResult] = useState<CasePredictionResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -57,7 +56,6 @@ const CasePrediction = () => {
     try {
       const result = await apiService.extractTextFromDocument(file);
       if (result.success && result.extracted_text) {
-        setExtractedText(result.extracted_text);
         setCaseDetails(result.extracted_text);
         toast({
           title: "Text extracted successfully",
@@ -126,7 +124,6 @@ const CasePrediction = () => {
   const clearForm = () => {
     setCaseDetails("");
     setUploadedFile(null);
-    setExtractedText("");
     setPredictionResult(null);
     setError(null);
     if (fileInputRef.current) {
@@ -137,7 +134,7 @@ const CasePrediction = () => {
   const testConnection = async () => {
     setIsTestingConnection(true);
     try {
-      const result = await apiService.predictCaseOutcome("Test connection");
+      await apiService.predictCaseOutcome("Test connection");
       toast({
         title: "Connection successful!",
         description: "AI backend is responding correctly.",

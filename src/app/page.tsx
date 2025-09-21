@@ -1,11 +1,7 @@
 import Navigation from "@/components/Navigation";
-import HeroSection from "@/components/HeroSection";
-import FeaturesSection from "@/components/FeaturesSection";
 import { AdvancedTimeline } from "@/components/AdvancedTimeline";
-import { FireworksBackground } from "@/components/FireworksBackground";
 import AnimatedIntro from "@/components/AnimatedIntro";
 import AnimatedFeatures from "@/components/AnimatedFeatures";
-import FloatingParticles from "@/components/FloatingParticles";
 import ModernDashboard from "@/components/ModernDashboard";
 
 export default function Home() {

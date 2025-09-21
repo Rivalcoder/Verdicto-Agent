@@ -163,7 +163,7 @@ const DemoInterface = ({ activeTab: initialTab }: { activeTab?: string }) => {
                     <div className="flex justify-start">
                       <div className="bg-primary text-primary-foreground rounded-2xl rounded-bl-sm px-4 py-2 max-w-xs">
                         <p className="text-sm">
-                          Hello! I'm your AI legal assistant. How can I help you today?
+                          Hello! I&apos;m your AI legal assistant. How can I help you today?
                         </p>
                       </div>
                     </div>
@@ -285,7 +285,7 @@ const DemoInterface = ({ activeTab: initialTab }: { activeTab?: string }) => {
                       <div className="text-4xl font-bold text-success mb-2">78%</div>
                       <Progress value={78} className="mb-4" />
                       <p className="text-sm text-muted-foreground">
-                        Based on 1,247 similar cases and Judge Mitchell's ruling patterns
+                        Based on 1,247 similar cases and Judge Mitchell&apos;s ruling patterns
                       </p>
                     </Card>
 
