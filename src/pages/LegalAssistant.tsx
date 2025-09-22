@@ -7,6 +7,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Bot, User, Mic, MicOff, Paperclip, Smile, Copy, ThumbsUp, ThumbsDown } from "lucide-react";
 import ChatSidebar from "@/components/ChatSidebar";
+import { useAuth } from "@/hooks/useAuth";
+import { addMessage, createConversation, updateConversation, type Conversation, getMessages, findDraftConversation } from "@/services/chat";
+import { notifyConversationsUpdated } from "@/services/chat";
 
 function escapeHtml(input: string): string {
   return input
@@ -52,35 +55,30 @@ function markdownToHtml(markdown: string): string {
   return out.join('\n');
 }
 
+type ChatMessage = {
+  id: number;
+  type: 'assistant' | 'user';
+  content: string;
+  timestamp: string;
+  isLiked: boolean;
+  isDisliked: boolean;
+};
+
 const LegalAssistant = () => {
+  const { user } = useAuth();
+  const [conversation, setConversation] = useState<Conversation | null>(null);
   const [message, setMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   
-  const [messages, setMessages] = useState([
+  const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: 1,
       type: "assistant",
-      content: "Hello! I'm your AI Legal Assistant. I can help you with legal research, document drafting, case analysis, and client communications. How can I assist you today?",
-      timestamp: "10:30 AM",
-      isLiked: false,
-      isDisliked: false
-    },
-    {
-      id: 2,
-      type: "user",
-      content: "Can you help me draft a non-disclosure agreement for a tech startup?",
-      timestamp: "10:32 AM",
-      isLiked: false,
-      isDisliked: false
-    },
-    {
-      id: 3,
-      type: "assistant",
-      content: "Absolutely! I'll help you draft a comprehensive NDA tailored for tech startups. I'll need some information: 1) What type of information will be disclosed? 2) Who are the parties involved? 3) What's the duration of confidentiality? 4) Any specific jurisdiction requirements?",
-      timestamp: "10:32 AM",
+      content: "Hello! I'm your AI Legal Assistant. How can I assist you today?",
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       isLiked: false,
       isDisliked: false
     }
@@ -93,6 +91,40 @@ const LegalAssistant = () => {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Listen for conversation selection from sidebar
+  useEffect(() => {
+    const handler = async (e: any) => {
+      const id = e?.detail?.id as string | undefined;
+      if (!id || !user) return;
+      try {
+        const msgs = await getMessages(id);
+        setConversation({ id } as any);
+        setMessages([
+          {
+            id: 1,
+            type: 'assistant',
+            content: "Hello! I'm your AI Legal Assistant. How can I assist you today?",
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            isLiked: false,
+            isDisliked: false
+          },
+          ...msgs.map((m, idx) => ({
+            id: idx + 2,
+            type: (m.role === 'assistant' ? 'assistant' : 'user') as ChatMessage['type'],
+            content: m.content,
+            timestamp: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            isLiked: false,
+            isDisliked: false
+          }))
+        ]);
+      } catch {
+        // ignore
+      }
+    };
+    window.addEventListener('conversation:selected', handler as EventListener);
+    return () => window.removeEventListener('conversation:selected', handler as EventListener);
+  }, [user]);
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -129,6 +161,50 @@ const LegalAssistant = () => {
       if (textareaRef.current) {
         textareaRef.current.style.height = 'auto';
       }
+      
+      // Persist user message and ensure conversation exists (only if signed in)
+      (async () => {
+        try {
+          if (!user) return;
+          let conv = conversation;
+          if (!conv) {
+            const draft = await findDraftConversation(user.id);
+            if (draft) {
+              setConversation(draft);
+              conv = draft;
+            } else {
+              const created = await createConversation({
+                user_id: user.id,
+                title: newMessage.content.slice(0, 40) || 'New Conversation',
+                is_starred: false,
+                unread_count: 0,
+                last_message: newMessage.content,
+                last_message_at: new Date().toISOString(),
+              });
+              setConversation(created);
+              conv = created;
+              notifyConversationsUpdated();
+            }
+          }
+          await addMessage({
+            conversation_id: conv.id,
+            user_id: user.id,
+            role: 'user',
+            content: newMessage.content,
+          });
+          notifyConversationsUpdated();
+        } catch (e) {
+          try {
+            const code = e instanceof Error ? e.message : '';
+            if (code !== 'SCHEMA_MISSING') {
+              const detail = e && typeof e === 'object' ? JSON.stringify(e) : String(e);
+              console.error('Failed to persist user message', detail);
+            }
+          } catch {
+            console.error('Failed to persist user message', e);
+          }
+        }
+      })();
 
       // Call Assistant API (RAG)
       (async () => {
@@ -142,8 +218,22 @@ const LegalAssistant = () => {
             const text = await res.text();
             throw new Error(text || `HTTP ${res.status}`);
           }
-          const data = await res.json();
-          const assistantContent: string = data?.response || 'No response received.';
+          let assistantContent = 'No response received.';
+          try {
+            const data = await res.json();
+            if (data && typeof data === 'object') {
+              const resp = (data as any).response;
+              assistantContent = typeof resp === 'string' && resp.trim().length > 0 ? resp : assistantContent;
+            }
+          } catch (e) {
+            // if body isn't JSON, show plain text
+            try {
+              const text = await res.text();
+              assistantContent = text || assistantContent;
+            } catch {
+              // ignore
+            }
+          }
           setIsTyping(false);
           setMessages(prev => [...prev, {
             id: prev.length + 1,
@@ -153,17 +243,60 @@ const LegalAssistant = () => {
             isLiked: false,
             isDisliked: false
           }]);
+
+          // Persist assistant message and update conversation (only if signed in)
+          if (user && conversation) {
+            try {
+              let convId = conversation?.id;
+              if (!convId) {
+                const created = await createConversation({
+                  user_id: user.id,
+                  title: newMessage.content.slice(0, 40) || 'New Conversation',
+                  is_starred: false,
+                  unread_count: 0,
+                  last_message: assistantContent,
+                  last_message_at: new Date().toISOString(),
+                });
+                setConversation(created);
+                convId = created.id;
+              }
+              await addMessage({
+                conversation_id: convId,
+                user_id: user.id,
+                role: 'assistant',
+                content: assistantContent,
+              });
+              await updateConversation(convId, {
+                last_message: assistantContent,
+                last_message_at: new Date().toISOString(),
+              });
+              notifyConversationsUpdated();
+            } catch (e) {
+              try {
+                const code = e instanceof Error ? e.message : '';
+                if (code !== 'SCHEMA_MISSING') {
+                  const detail = e && typeof e === 'object' ? JSON.stringify(e) : String(e);
+                  console.error('Failed to persist assistant message', detail);
+                }
+              } catch {
+                console.error('Failed to persist assistant message', e);
+              }
+            }
+          }
         } catch (err: unknown) {
-          const message = err instanceof Error ? err.message : 'Unknown error';
-          setIsTyping(false);
-          setMessages(prev => [...prev, {
-            id: prev.length + 1,
-            type: "assistant" as const,
+          let message = 'Unknown error';
+          try {
+            message = err instanceof Error ? err.message : JSON.stringify(err);
+          } catch {}
+        setIsTyping(false);
+        setMessages(prev => [...prev, {
+          id: prev.length + 1,
+          type: "assistant" as const,
             content: `**Error:** ${message}`,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            isLiked: false,
-            isDisliked: false
-          }]);
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          isLiked: false,
+          isDisliked: false
+        }]);
         }
       })();
     }
@@ -249,9 +382,9 @@ const LegalAssistant = () => {
                           : 'bg-card border border-border'
                       }`}>
                         {msg.type === 'assistant' ? (
-                          <div className="text-sm leading-relaxed prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: markdownToHtml(msg.content) }} />
+                          <div className="text-sm leading-relaxed prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: markdownToHtml(String(msg.content || '')) }} />
                         ) : (
-                          <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                          <p className="text-sm leading-relaxed whitespace-pre-wrap">{String(msg.content || '')}</p>
                         )}
                         <div className={`flex items-center justify-between mt-2 ${
                           msg.type === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'
