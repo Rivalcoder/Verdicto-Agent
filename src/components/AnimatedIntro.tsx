@@ -1,10 +1,43 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { ArrowRight, Sparkles, Zap, Shield, Brain, Scale } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { Button } from '@/components/ui/button';
+import { ArrowRight, Sparkles, Zap, Shield, Brain, FileSearch, Gavel, Scale } from 'lucide-react';
+import heroBg from '@/assets/hero-bg-enhanced.jpg';
 
 const AnimatedIntro = () => {
   const [currentText, setCurrentText] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+
+  // Deterministic PRNG to avoid hydration mismatches from Math.random()
+  const blobs = useMemo(() => {
+    function mulberry32(a: number) {
+      return function () {
+        a |= 0; a = a + 0x6D2B79F5 | 0;
+        let t = Math.imul(a ^ a >>> 15, 1 | a);
+        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+      };
+    }
+    const rng = mulberry32(123456789);
+    const count = 12;
+    const classes = [
+      'w-96 h-96 bg-gradient-to-r from-blue-400/30 to-indigo-400/30',
+      'w-80 h-80 bg-gradient-to-r from-purple-400/30 to-pink-400/30',
+      'w-64 h-64 bg-gradient-to-r from-cyan-400/30 to-blue-400/30',
+      'w-72 h-72 bg-gradient-to-r from-indigo-400/30 to-purple-400/30'
+    ];
+    return Array.from({ length: count }).map((_, i) => {
+      const left = `${(rng() * 100).toFixed(6)}%`;
+      const top = `${(rng() * 100).toFixed(6)}%`;
+      const delay = `${(i * 0.8).toString()}s`;
+      const duration = `${12 + i * 2}s`;
+      const cls = classes[i % classes.length];
+      return { left, top, delay, duration, cls };
+    });
+  }, []);
 
   const texts = [
     "AI-Powered Legal Solutions",
@@ -15,10 +48,10 @@ const AnimatedIntro = () => {
   ];
 
   const features = [
-    { icon: Brain, text: "AI Intelligence", delay: 0 },
-    { icon: Shield, text: "Secure & Private", delay: 0.2 },
-    { icon: Zap, text: "Lightning Fast", delay: 0.4 },
-    { icon: Scale, text: "Legal Expertise", delay: 0.6 }
+    { icon: Brain, text: "AI Intelligence", delay: 0, color: "from-blue-500 to-cyan-500" },
+    { icon: Shield, text: "Secure & Private", delay: 0.2, color: "from-green-500 to-emerald-500" },
+    { icon: Zap, text: "Lightning Fast", delay: 0.4, color: "from-yellow-500 to-orange-500" },
+    { icon: Scale, text: "Legal Expertise", delay: 0.6, color: "from-purple-500 to-pink-500" }
   ];
 
   useEffect(() => {
@@ -26,165 +59,144 @@ const AnimatedIntro = () => {
       setCurrentText((prev) => (prev + 1) % texts.length);
     }, 3000);
 
+    setIsVisible(true);
     return () => clearInterval(interval);
   }, [texts.length]);
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        {/* Floating Orbs */}
-        {[...Array(6)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-32 h-32 rounded-full bg-gradient-to-r from-blue-400/20 to-purple-400/20 dark:from-blue-600/30 dark:to-purple-600/30 blur-xl animate-pulse"
-            style={{
-              left: `${20 + i * 15}%`,
-              top: `${30 + (i % 3) * 20}%`,
-              animationDelay: `${i * 0.5}s`,
-              animationDuration: `${8 + i * 2}s`,
-            }}
-          />
-        ))}
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Enhanced Animated Background */}
+      <div className="absolute inset-0 z-0">
+        {/* Light mode image + overlay */}
+        <div className="absolute inset-0 dark:hidden">
+          <Image src={require('@/assets/hero-bg-enhanced.jpg')} alt="AI Legal Technology Background" fill priority className="object-cover animate-scale-in" />
+          {/* Light overlay matched to below area colors */}
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/90 via-white/85 to-cyan-50/90" />
+        </div>
+        {/* Dark mode gradient matched to below sections */}
+        <div className="hidden dark:block absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
 
-        {/* Animated Lines */}
-        <div className="absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent animate-pulse" />
-        <div className="absolute top-3/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent animate-pulse" style={{ animationDelay: '1s' }} />
+        {/* Fixed animated floating elements */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-20 left-10 w-4 h-4 bg-white/70 rounded-full animate-particle-float" />
+          <div className="absolute top-40 right-20 w-3 h-3 bg-white rounded-full animate-bounce-gentle opacity-60" />
+          <div className="absolute top-60 left-1/4 w-2 h-2 bg-white/80 rounded-full animate-float" />
+          <div className="absolute bottom-40 right-10 w-5 h-5 bg-white/60 rounded-full animate-float" />
+          <div className="absolute bottom-20 left-20 w-3 h-3 bg-white rounded-full animate-particle-float opacity-80" />
+          <div className="absolute top-1/3 right-1/3 w-2 h-2 bg-white/70 rounded-full animate-float" />
+          <div className="absolute bottom-1/3 left-1/2 w-3 h-3 bg-white/60 rounded-full animate-bounce-gentle" />
+
+          {/* Shapes */}
+          <div className="absolute top-32 right-1/4 w-8 h-8 border-2 border-white/40 rotate-45 animate-rotate-3d opacity-70" />
+          <div className="absolute bottom-32 left-1/3 w-6 h-6 border-2 border-white/30 animate-float opacity-60" />
+          <div className="absolute top-1/2 left-10 w-4 h-4 border border-white/30 rounded-full animate-pulse-glow opacity-50" />
+          <div className="absolute top-1/4 left-1/4 w-24 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer-enhanced" />
+          <div className="absolute bottom-1/4 right-1/4 w-32 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer-enhanced" />
+          <div className="absolute top-16 right-16 w-16 h-16 border border-white/20 rounded-2xl rotate-12 animate-float opacity-30" />
+          <div className="absolute bottom-16 left-16 w-12 h-12 bg-white/10 rounded-full animate-pulse-glow opacity-40" />
+        </div>
       </div>
 
-      {/* Main Content */}
-      <div className="relative z-10 text-center px-4 max-w-6xl mx-auto">
-        {/* Logo Animation */}
-        <div className="mb-8 animate-bounce">
-          <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 shadow-2xl">
-            <Scale className="w-12 h-12 text-white" />
+      {/* Hero Content */}
+      <div className="relative mt-24 z-10 max-w-7xl mx-auto px-6 text-center text-slate-900 dark:text-white">
+        {/* Animated Badge */}
+        <div className="flex items-center justify-center gap-2 mb-6 animate-fade-in">
+          <div className="p-2 bg-white/10 backdrop-blur-sm rounded-xl animate-glow-pulse">
+            <Brain className="h-8 w-8 text-white" />
           </div>
-        </div>
-
-        {/* Old Style Text with Animation */}
-        <div className="mb-8 animate-fade-in">
-          <div className="text-sm md:text-base text-gray-600 dark:text-gray-400 mb-2 tracking-widest uppercase font-medium animate-slide-in-left vintage-text">
-            <span className="inline-block animate-typewriter">Est. 2024</span>
-            <span className="mx-2">•</span>
-            <span className="inline-block animate-typewriter" style={{ animationDelay: '1s' }}>Legal Technology</span>
-          </div>
-          <div className="w-24 h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent mx-auto mb-6 animate-slide-in-left" style={{ animationDelay: '0.2s' }}></div>
+          <span className="text-lg font-medium tracking-wider uppercase text-white drop-shadow-lg">
+            Next-Gen AI Legal Platform
+          </span>
+          <Sparkles className="h-6 w-6 text-white animate-pulse" />
         </div>
 
         {/* Main Heading */}
-        <h1 className="text-6xl md:text-8xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent animate-fade-in relative">
-          <span className="relative inline-block">
-            Verdicto
-            <div className="absolute -top-2 -right-2 w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></div>
+        <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+          <span className="block animate-fade-in-up gradient-text-animated">
+            The Future of
+          </span>
+          <span className="block animate-fade-in-up animation-delay-1000 gradient-text-animated">
+            Legal Intelligence
           </span>
         </h1>
 
-        {/* Decorative Line */}
-        <div className="flex items-center justify-center mb-8 animate-fade-in" style={{ animationDelay: '0.5s' }}>
-          <div className="w-16 h-px bg-gradient-to-r from-transparent to-blue-500"></div>
-          <div className="mx-4 w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-          <div className="w-16 h-px bg-gradient-to-l from-transparent to-blue-500"></div>
-        </div>
-
-        {/* Vintage Decorative Elements */}
-        <div className="absolute top-20 left-10 text-4xl opacity-20 dark:opacity-40 animate-rotate-slow">⚖️</div>
-        <div className="absolute top-32 right-16 text-3xl opacity-20 dark:opacity-40 animate-float">📜</div>
-        <div className="absolute bottom-40 left-20 text-2xl opacity-20 dark:opacity-40 animate-bounce-subtle">⚡</div>
-        <div className="absolute bottom-60 right-12 text-3xl opacity-20 dark:opacity-40 animate-pulse">🏛️</div>
-
-        {/* Animated Subtitle */}
-        <div className="h-20 flex items-center justify-center mb-8">
-          <div className="text-2xl md:text-4xl font-semibold text-gray-700 dark:text-gray-300 transition-all duration-500 relative">
-            <span className="inline-block animate-bounce-subtle" style={{ animationDelay: '0.3s' }}>
-              {texts[currentText]}
-            </span>
-            <div className="absolute -bottom-2 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 animate-pulse"></div>
-          </div>
-        </div>
-
-        {/* Feature Pills */}
-        <div className="flex flex-wrap justify-center gap-4 mb-12">
-          {features.map((feature) => (
-            <div
-              key={feature.text}
-              className="flex items-center gap-2 px-6 py-3 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:scale-105 hover:shadow-xl transition-all duration-300"
-              style={{ animationDelay: `${0.8 + feature.delay}s` }}
-            >
-              <feature.icon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {feature.text}
-              </span>
-            </div>
-          ))}
+        {/* Subtitle */}
+        <div className="animate-fade-in-delay-2">
+          <p className="text-xl md:text-2xl mb-10 max-w-4xl mx-auto leading-relaxed text-slate-700 dark:text-white drop-shadow-lg">
+            Revolutionize your legal practice with AI-powered contract analysis, 
+            predictive case outcomes, and intelligent virtual assistance. 
+            <span className="font-semibold text-slate-900 dark:text-white">Built for modern law firms who demand excellence.</span>
+          </p>
         </div>
 
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <button className="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full font-semibold text-lg shadow-2xl hover:shadow-blue-500/25 transition-all duration-300 hover:scale-105 hover:-translate-y-1">
-            <span className="relative z-10 flex items-center gap-2">
-              Get Started
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </span>
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-700 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          </button>
-
-          <button className="group px-8 py-4 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-full font-semibold text-lg hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 hover:scale-105 hover:-translate-y-1">
-            <span className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-              Learn More
-            </span>
-          </button>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-fade-in-delay-3">
+          <Button asChild size="lg" className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 text-lg font-semibold shadow-elegant transition-all duration-300 hover:scale-105 hover:shadow-xl group ">
+            <Link href="/dashboard">
+              Enter AI Platform
+              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </Button>
+          <Button size="lg" variant="outline" className="bg-white/20 dark:bg-white/10 border-white/50 dark:border-white/30 text-white hover:bg-white/30 dark:hover:bg-white/20 px-8 py-4 text-lg font-semibold backdrop-blur-sm transition-all duration-300 hover:scale-105 group shadow-lg">
+            <Zap className="mr-2 h-5 w-5 group-hover:rotate-12 transition-transform" />
+            Watch Demo
+          </Button>
         </div>
 
-        {/* Old Style Decorative Section */}
-        <div className="mt-12 mb-8 animate-fade-in" style={{ animationDelay: '1s' }}>
-          <div className="flex items-center justify-center mb-6">
-            <div className="w-32 h-px bg-gradient-to-r from-transparent via-gray-400 to-transparent"></div>
-            <div className="mx-4 text-gray-500 dark:text-gray-400 text-sm font-medium tracking-widest uppercase">
-              Trusted By
+        {/* Feature Highlights */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="flex flex-col items-center p-8 bg-white/5 backdrop-blur-md rounded-3xl border border-white/10 hover:bg-white/10 transition-all duration-300 hover:scale-105 hover:shadow-glow group animate-fade-in-delay-4">
+            <div className="p-4 bg-gradient-to-br from-indigo-600 to-blue-600 rounded-2xl mb-6 group-hover:scale-110 transition-transform">
+              <FileSearch className="h-12 w-12 text-white" />
             </div>
-            <div className="w-32 h-px bg-gradient-to-r from-transparent via-gray-400 to-transparent"></div>
+            <h3 className="text-xl font-semibold mb-3 text-white drop-shadow-lg">Smart Contract Analysis</h3>
+            <p className="text-white/90 text-center leading-relaxed drop-shadow-md">AI-powered clause extraction and risk assessment with 98% accuracy</p>
+            <div className="mt-4 px-3 py-1 bg-white/15 text-white rounded-full text-sm font-medium">
+              98% Accuracy
+            </div>
+          </div>
+          <div className="flex flex-col items-center p-8 bg-white/5 backdrop-blur-md rounded-3xl border border-white/10 hover:bg-white/10 transition-all duration-300 hover:scale-105 hover:shadow-glow group animate-fade-in-delay-5">
+            <div className="p-4 bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl mb-6 group-hover:scale-110 transition-transform">
+              <Brain className="h-12 w-12 text-white" />
+            </div>
+            <h3 className="text-xl font-semibold mb-3 text-white drop-shadow-lg">Case Prediction</h3>
+            <p className="text-white/90 text-center leading-relaxed drop-shadow-md">Predict outcomes with 85% accuracy using advanced ML models</p>
+            <div className="mt-4 px-3 py-1 bg-white/15 text-white rounded-full text-sm font-medium">
+              85% Win Rate
+            </div>
+          </div>
+          <div className="flex flex-col items-center p-8 bg-white/5 backdrop-blur-md rounded-3xl border border-white/10 hover:bg-white/10 transition-all duration-300 hover:scale-105 hover:shadow-glow group animate-fade-in-delay-6">
+            <div className="p-4 bg-gradient-to-br from-cyan-600 to-teal-600 rounded-2xl mb-6 group-hover:scale-110 transition-transform">
+              <Gavel className="h-12 w-12 text-white" />
+            </div>
+            <h3 className="text-xl font-semibold mb-3 text-white drop-shadow-lg">Virtual Assistant</h3>
+            <p className="text-white/90 text-center leading-relaxed drop-shadow-md">24/7 AI assistant for clients and comprehensive case management</p>
+            <div className="mt-4 px-3 py-1 bg-white/15 text-white rounded-full text-sm font-medium">
+              24/7 Support
+            </div>
           </div>
         </div>
 
-        {/* Floating Stats */}
-        <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-8">
-          {[
-            { number: "10M+", label: "Cases Analyzed", icon: "⚖️" },
-            { number: "99.9%", label: "Accuracy", icon: "🎯" },
-            { number: "24/7", label: "Available", icon: "🕐" },
-            { number: "500+", label: "Law Firms", icon: "🏢" }
-          ].map((stat, index) => (
-            <div
-              key={stat.label}
-              className="text-center p-6 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-200/50 dark:border-gray-700/50 hover:scale-105 hover:-translate-y-2 transition-all duration-300 relative group"
-              style={{ animationDelay: `${1.4 + index * 0.1}s` }}
-            >
-              {/* Decorative corner elements */}
-              <div className="absolute top-2 left-2 w-2 h-2 bg-blue-500 rounded-full opacity-60 group-hover:opacity-100 transition-opacity"></div>
-              <div className="absolute top-2 right-2 w-2 h-2 bg-purple-500 rounded-full opacity-60 group-hover:opacity-100 transition-opacity"></div>
-              <div className="absolute bottom-2 left-2 w-2 h-2 bg-indigo-500 rounded-full opacity-60 group-hover:opacity-100 transition-opacity"></div>
-              <div className="absolute bottom-2 right-2 w-2 h-2 bg-pink-500 rounded-full opacity-60 group-hover:opacity-100 transition-opacity"></div>
-              
-              <div className="text-2xl mb-2">{stat.icon}</div>
-              <div className="text-3xl md:text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">
-                {stat.number}
-              </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400 font-medium">
-                {stat.label}
-              </div>
+        {/* Trust Indicators */}
+        <div className="mt-16 mb-24 animate-fade-in-delay-6">
+          <p className="text-sm text-white/80 mb-4 drop-shadow-md">Trusted by leading law firms worldwide</p>
+          <div className="flex items-center justify-center gap-8">
+            <div className="flex items-center gap-2">
+              <Shield className="h-5 w-5 text-white" />
+              <span className="text-sm text-white/90 drop-shadow-sm">Bank-Level Security</span>
             </div>
-          ))}
+            <div className="flex items-center gap-2">
+              <Zap className="h-5 w-5 text-white" />
+              <span className="text-sm text-white/90 drop-shadow-sm">Real-Time Processing</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Brain className="h-5 w-5 text-white" />
+              <span className="text-sm text-white/90 drop-shadow-sm">AI-Powered</span>
+            </div>
+          </div>
         </div>
       </div>
-
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-        <div className="w-6 h-10 border-2 border-gray-400 dark:border-gray-600 rounded-full flex justify-center">
-          <div className="w-1 h-3 bg-gray-400 dark:bg-gray-600 rounded-full mt-2 animate-pulse" />
-        </div>
-      </div>
-    </div>
+    </section>
   );
 };
 
