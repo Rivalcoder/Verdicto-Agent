@@ -13,8 +13,6 @@ import {
   TrendingUp,
   Globe,
   Play,
-  BarChart3,
-  Star,
   CheckCircle
 } from 'lucide-react';
 

@@ -1,67 +1,11 @@
 'use client';
-
-import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Sparkles, Zap, Shield, Brain, FileSearch, Gavel, Scale } from 'lucide-react';
-import heroBg from '@/assets/hero-bg-enhanced.jpg';
+import { ArrowRight, Sparkles, Zap, Shield, Brain, FileSearch, Gavel } from 'lucide-react';
+// removed unused heroBg and Image to clear warnings
 
 const AnimatedIntro = () => {
-  const [currentText, setCurrentText] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
-
-  // Deterministic PRNG to avoid hydration mismatches from Math.random()
-  const blobs = useMemo(() => {
-    function mulberry32(a: number) {
-      return function () {
-        a |= 0; a = a + 0x6D2B79F5 | 0;
-        let t = Math.imul(a ^ a >>> 15, 1 | a);
-        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
-        return ((t ^ t >>> 14) >>> 0) / 4294967296;
-      };
-    }
-    const rng = mulberry32(123456789);
-    const count = 12;
-    const classes = [
-      'w-96 h-96 bg-gradient-to-r from-blue-400/30 to-indigo-400/30',
-      'w-80 h-80 bg-gradient-to-r from-purple-400/30 to-pink-400/30',
-      'w-64 h-64 bg-gradient-to-r from-cyan-400/30 to-blue-400/30',
-      'w-72 h-72 bg-gradient-to-r from-indigo-400/30 to-purple-400/30'
-    ];
-    return Array.from({ length: count }).map((_, i) => {
-      const left = `${(rng() * 100).toFixed(6)}%`;
-      const top = `${(rng() * 100).toFixed(6)}%`;
-      const delay = `${(i * 0.8).toString()}s`;
-      const duration = `${12 + i * 2}s`;
-      const cls = classes[i % classes.length];
-      return { left, top, delay, duration, cls };
-    });
-  }, []);
-
-  const texts = [
-    "AI-Powered Legal Solutions",
-    "Intelligent Case Analysis", 
-    "Smart Document Review",
-    "Automated Legal Research",
-    "Predictive Legal Insights"
-  ];
-
-  const features = [
-    { icon: Brain, text: "AI Intelligence", delay: 0, color: "from-blue-500 to-cyan-500" },
-    { icon: Shield, text: "Secure & Private", delay: 0.2, color: "from-green-500 to-emerald-500" },
-    { icon: Zap, text: "Lightning Fast", delay: 0.4, color: "from-yellow-500 to-orange-500" },
-    { icon: Scale, text: "Legal Expertise", delay: 0.6, color: "from-purple-500 to-pink-500" }
-  ];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentText((prev) => (prev + 1) % texts.length);
-    }, 3000);
-
-    setIsVisible(true);
-    return () => clearInterval(interval);
-  }, [texts.length]);
+  // cleaned unused state/effects to resolve build warnings
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-white dark:bg-transparent">

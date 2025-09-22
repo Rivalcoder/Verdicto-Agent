@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Brain, FileSearch, Gavel, Sparkles, Zap, Shield, CheckCircle } from "lucide-react";
+import { ArrowRight, Brain, FileSearch, Gavel, Sparkles, Zap, Shield } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import heroBg from "@/assets/hero-bg-enhanced.jpg";
