@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+const HF_ANALYZE_URL = 'https://rivalcoder-smart-contract-analyzer.hf.space/analyze/';
+
 export async function POST(request: NextRequest) {
   try {
-    const formData = await request.formData();
-    const file = formData.get('file') as File;
+    const incomingFormData = await request.formData();
+    const file = incomingFormData.get('file') as File | null;
 
     if (!file) {
       return NextResponse.json(
@@ -12,45 +14,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Mock response for now - replace with actual contract analysis service
-    const mockResponse = {
-      file_name: file.name,
-      language: "English",
-      contract_type: "Service Agreement",
-      final_risk_score: Math.floor(Math.random() * 30) + 20, // 20-50 risk score
-      clauses: [
-        {
-          clause_number: 1,
-          text: "Payment terms and conditions",
-          risks: [
-            {
-              risk_id: "payment_terms",
-              score: 25,
-              description: "Payment terms may be ambiguous"
-            }
-          ],
-          suggestion: "Clarify payment terms and add late payment penalties"
-        },
-        {
-          clause_number: 2,
-          text: "Termination conditions",
-          risks: [
-            {
-              risk_id: "termination",
-              score: 15,
-              description: "Termination clause lacks specificity"
-            }
-          ],
-          suggestion: "Define clear termination conditions and notice periods"
-        }
-      ]
-    };
+    const forwardFormData = new FormData();
+    forwardFormData.append('file', file, (file as File).name);
 
-    return NextResponse.json(mockResponse);
-  } catch (error) {
+    const upstreamResponse = await fetch(HF_ANALYZE_URL, {
+      method: 'POST',
+      body: forwardFormData,
+    });
+
+    if (!upstreamResponse.ok) {
+      const errorText = await upstreamResponse.text();
+      return NextResponse.json(
+        { error: `Upstream error: ${upstreamResponse.status} ${errorText}` },
+        { status: upstreamResponse.status }
+      );
+    }
+
+    const data = await upstreamResponse.json();
+    return NextResponse.json(data);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    const isConnErr = message.includes('fetch') || message.includes('Failed to fetch') || message.includes('ECONNREFUSED');
+    const friendly = isConnErr
+      ? 'Connection failed: Unable to reach the contract analysis service. Please check your internet connection.'
+      : 'Internal server error';
     console.error('Error in analyze API:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: friendly },
       { status: 500 }
     );
   }

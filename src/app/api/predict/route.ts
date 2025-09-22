@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:7860';
+
 export async function POST(request: NextRequest) {
   try {
     const { case: caseDetails } = await request.json();
@@ -11,25 +13,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Mock response for now - replace with actual AI service integration
-    const mockResponse = {
-      prediction: {
-        probability: Math.random() * 0.4 + 0.6, // 60-100% probability
-        timeline: "3-6 months",
-        feature_points: [
-          "Strong precedent support",
-          "Favorable jurisdiction",
-          "Clear evidence trail",
-          "Experienced legal team"
-        ]
-      }
-    };
+    const upstreamResponse = await fetch(`${BASE_URL}/predict`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ case: caseDetails }),
+    });
 
-    return NextResponse.json(mockResponse);
-  } catch (error) {
+    if (!upstreamResponse.ok) {
+      const errorText = await upstreamResponse.text();
+      return NextResponse.json(
+        { error: `Upstream error: ${upstreamResponse.status} ${errorText}` },
+        { status: upstreamResponse.status }
+      );
+    }
+
+    const data = await upstreamResponse.json();
+    return NextResponse.json(data);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    const isConnErr = message.includes('fetch') || message.includes('ECONNREFUSED');
+    const friendly = isConnErr
+      ? 'Connection failed: Unable to reach AI backend. Please check if the server is running on http://127.0.0.1:7860'
+      : 'Internal server error';
     console.error('Error in predict API:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: friendly },
       { status: 500 }
     );
   }
