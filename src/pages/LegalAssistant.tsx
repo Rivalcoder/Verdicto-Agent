@@ -8,6 +8,50 @@ import { Textarea } from "@/components/ui/textarea";
 import { Send, Bot, User, Mic, MicOff, Paperclip, Smile, Copy, ThumbsUp, ThumbsDown } from "lucide-react";
 import ChatSidebar from "@/components/ChatSidebar";
 
+function escapeHtml(input: string): string {
+  return input
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function markdownToHtml(markdown: string): string {
+  const safe = escapeHtml(markdown);
+  // Links: [text](url)
+  let html = safe.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="underline">$1</a>');
+  // Bold: **text**
+  html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+
+  // Lists
+  const lines = html.split(/\r?\n/);
+  const out: string[] = [];
+  let inUl = false;
+  for (const line of lines) {
+    const liMatch = /^\s*[\-*]\s+(.*)$/.exec(line);
+    if (liMatch) {
+      if (!inUl) {
+        inUl = true;
+        out.push('<ul class="list-disc pl-5 space-y-1">');
+      }
+      out.push(`<li>${liMatch[1]}</li>`);
+      continue;
+    }
+    if (inUl) {
+      out.push('</ul>');
+      inUl = false;
+    }
+    if (line.trim() === '') {
+      out.push('<br/>');
+    } else {
+      out.push(line);
+    }
+  }
+  if (inUl) out.push('</ul>');
+  return out.join('\n');
+}
+
 const LegalAssistant = () => {
   const [message, setMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -85,19 +129,43 @@ const LegalAssistant = () => {
       if (textareaRef.current) {
         textareaRef.current.style.height = 'auto';
       }
-      
-      // Simulate AI response
-      setTimeout(() => {
-        setIsTyping(false);
-        setMessages(prev => [...prev, {
-          id: prev.length + 1,
-          type: "assistant" as const,
-          content: "I understand your request. Let me analyze this and provide you with the most relevant legal guidance based on current regulations and best practices.",
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          isLiked: false,
-          isDisliked: false
-        }]);
-      }, 1500);
+
+      // Call Assistant API (RAG)
+      (async () => {
+        try {
+          const res = await fetch('/api/assistant', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: newMessage.content })
+          });
+          if (!res.ok) {
+            const text = await res.text();
+            throw new Error(text || `HTTP ${res.status}`);
+          }
+          const data = await res.json();
+          const assistantContent: string = data?.response || 'No response received.';
+          setIsTyping(false);
+          setMessages(prev => [...prev, {
+            id: prev.length + 1,
+            type: "assistant" as const,
+            content: assistantContent,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            isLiked: false,
+            isDisliked: false
+          }]);
+        } catch (err: unknown) {
+          const message = err instanceof Error ? err.message : 'Unknown error';
+          setIsTyping(false);
+          setMessages(prev => [...prev, {
+            id: prev.length + 1,
+            type: "assistant" as const,
+            content: `**Error:** ${message}`,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            isLiked: false,
+            isDisliked: false
+          }]);
+        }
+      })();
     }
   };
 
@@ -180,7 +248,11 @@ const LegalAssistant = () => {
                           ? 'bg-primary text-primary-foreground ml-auto' 
                           : 'bg-card border border-border'
                       }`}>
-                        <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                        {msg.type === 'assistant' ? (
+                          <div className="text-sm leading-relaxed prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: markdownToHtml(msg.content) }} />
+                        ) : (
+                          <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                        )}
                         <div className={`flex items-center justify-between mt-2 ${
                           msg.type === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'
                         }`}>
