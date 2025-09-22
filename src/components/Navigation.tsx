@@ -58,7 +58,7 @@ const Navigation = () => {
             <span className={`text-2xl font-bold transition-all duration-300 ${
               isScrolled 
                 ? 'bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent drop-shadow-lg' 
-                : 'text-white drop-shadow-2xl'
+                : 'bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent drop-shadow-lg'
             }`}>
               Verdicto
             </span>
@@ -111,7 +111,7 @@ const Navigation = () => {
                   className={`font-medium transition-all duration-200 hover:scale-105 ${
                     isScrolled 
                       ? 'bg-background/80 border-border hover:bg-accent backdrop-blur-sm text-foreground' 
-                      : 'bg-white/95 dark:bg-slate-900/95 border-white/30 dark:border-slate-700/30 hover:bg-white dark:hover:bg-slate-800 backdrop-blur-sm text-slate-900 dark:text-white shadow-lg'
+                      : 'bg-transparent border-transparent hover:bg-primary/10 text-primary shadow-none'
                   }`}
                 >
                   <Link href="/auth">Sign In</Link>
@@ -137,7 +137,7 @@ const Navigation = () => {
               className={`p-2 rounded-lg transition-all duration-200 hover:scale-105 ${
                 isScrolled 
                   ? 'text-foreground hover:bg-accent' 
-                  : 'text-white hover:bg-white/20 backdrop-blur-sm'
+                  : 'text-primary hover:bg-primary/10'
               }`}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               aria-label="Toggle menu"

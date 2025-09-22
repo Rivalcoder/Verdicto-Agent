@@ -64,15 +64,11 @@ const AnimatedIntro = () => {
   }, [texts.length]);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-white dark:bg-transparent">
       {/* Enhanced Animated Background */}
       <div className="absolute inset-0 z-0">
-        {/* Light mode image + overlay */}
-        <div className="absolute inset-0 dark:hidden">
-          <Image src={require('@/assets/hero-bg-enhanced.jpg')} alt="AI Legal Technology Background" fill priority className="object-cover animate-scale-in" />
-          {/* Light overlay matched to below area colors */}
-          <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/90 via-white/85 to-cyan-50/90" />
-        </div>
+        {/* Light mode solid background */}
+        <div className="absolute inset-0 dark:hidden bg-white" />
         {/* Dark mode gradient matched to below sections */}
         <div className="hidden dark:block absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900" />
 
@@ -101,13 +97,13 @@ const AnimatedIntro = () => {
       <div className="relative mt-24 z-10 max-w-7xl mx-auto px-6 text-center text-slate-900 dark:text-white">
         {/* Animated Badge */}
         <div className="flex items-center justify-center gap-2 mb-6 animate-fade-in">
-          <div className="p-2 bg-white/10 backdrop-blur-sm rounded-xl animate-glow-pulse">
-            <Brain className="h-8 w-8 text-white" />
+          <div className="p-2 bg-white/70 dark:bg-white/10 backdrop-blur-sm rounded-xl animate-glow-pulse">
+            <Brain className="h-8 w-8 text-slate-900 dark:text-white" />
           </div>
-          <span className="text-lg font-medium tracking-wider uppercase text-white drop-shadow-lg">
+          <span className="text-lg font-medium tracking-wider uppercase text-slate-900 dark:text-white drop-shadow-lg">
             Next-Gen AI Legal Platform
           </span>
-          <Sparkles className="h-6 w-6 text-white animate-pulse" />
+          <Sparkles className="h-6 w-6 text-slate-900 dark:text-white animate-pulse" />
         </div>
 
         {/* Main Heading */}
@@ -137,7 +133,7 @@ const AnimatedIntro = () => {
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Link>
           </Button>
-          <Button size="lg" variant="outline" className="bg-white/20 dark:bg-white/10 border-white/50 dark:border-white/30 text-white hover:bg-white/30 dark:hover:bg-white/20 px-8 py-4 text-lg font-semibold backdrop-blur-sm transition-all duration-300 hover:scale-105 group shadow-lg">
+          <Button size="lg" variant="outline" className="bg-white/80 dark:bg-white/10 border-slate-300 dark:border-white/30 text-slate-900 dark:text-white hover:bg-white dark:hover:bg-white/20 px-8 py-4 text-lg font-semibold backdrop-blur-sm transition-all duration-300 hover:scale-105 group shadow-lg">
             <Zap className="mr-2 h-5 w-5 group-hover:rotate-12 transition-transform" />
             Watch Demo
           </Button>
@@ -145,33 +141,33 @@ const AnimatedIntro = () => {
 
         {/* Feature Highlights */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          <div className="flex flex-col items-center p-8 bg-white/5 backdrop-blur-md rounded-3xl border border-white/10 hover:bg-white/10 transition-all duration-300 hover:scale-105 hover:shadow-glow group animate-fade-in-delay-4">
+          <div className="flex flex-col items-center p-8 bg-white/80 dark:bg-white/5 backdrop-blur-md rounded-3xl border border-slate-200 dark:border-white/10 hover:bg-white dark:hover:bg-white/10 transition-all duration-300 hover:scale-105 hover:shadow-glow group animate-fade-in-delay-4">
             <div className="p-4 bg-gradient-to-br from-indigo-600 to-blue-600 rounded-2xl mb-6 group-hover:scale-110 transition-transform">
               <FileSearch className="h-12 w-12 text-white" />
             </div>
-            <h3 className="text-xl font-semibold mb-3 text-white drop-shadow-lg">Smart Contract Analysis</h3>
-            <p className="text-white/90 text-center leading-relaxed drop-shadow-md">AI-powered clause extraction and risk assessment with 98% accuracy</p>
-            <div className="mt-4 px-3 py-1 bg-white/15 text-white rounded-full text-sm font-medium">
+            <h3 className="text-xl font-semibold mb-3 text-slate-900 dark:text-white drop-shadow-lg">Smart Contract Analysis</h3>
+            <p className="text-slate-700 dark:text-white/90 text-center leading-relaxed drop-shadow-md">AI-powered clause extraction and risk assessment with 98% accuracy</p>
+            <div className="mt-4 px-3 py-1 bg-slate-100 dark:bg-white/15 text-slate-700 dark:text-white rounded-full text-sm font-medium">
               98% Accuracy
             </div>
           </div>
-          <div className="flex flex-col items-center p-8 bg-white/5 backdrop-blur-md rounded-3xl border border-white/10 hover:bg-white/10 transition-all duration-300 hover:scale-105 hover:shadow-glow group animate-fade-in-delay-5">
+          <div className="flex flex-col items-center p-8 bg-white/80 dark:bg-white/5 backdrop-blur-md rounded-3xl border border-slate-200 dark:border-white/10 hover:bg-white dark:hover:bg-white/10 transition-all duration-300 hover:scale-105 hover:shadow-glow group animate-fade-in-delay-5">
             <div className="p-4 bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl mb-6 group-hover:scale-110 transition-transform">
               <Brain className="h-12 w-12 text-white" />
-            </div>
-            <h3 className="text-xl font-semibold mb-3 text-white drop-shadow-lg">Case Prediction</h3>
-            <p className="text-white/90 text-center leading-relaxed drop-shadow-md">Predict outcomes with 85% accuracy using advanced ML models</p>
-            <div className="mt-4 px-3 py-1 bg-white/15 text-white rounded-full text-sm font-medium">
+        </div>
+            <h3 className="text-xl font-semibold mb-3 text-slate-900 dark:text-white drop-shadow-lg">Case Prediction</h3>
+            <p className="text-slate-700 dark:text-white/90 text-center leading-relaxed drop-shadow-md">Predict outcomes with 85% accuracy using advanced ML models</p>
+            <div className="mt-4 px-3 py-1 bg-slate-100 dark:bg-white/15 text-slate-700 dark:text-white rounded-full text-sm font-medium">
               85% Win Rate
             </div>
-          </div>
-          <div className="flex flex-col items-center p-8 bg-white/5 backdrop-blur-md rounded-3xl border border-white/10 hover:bg-white/10 transition-all duration-300 hover:scale-105 hover:shadow-glow group animate-fade-in-delay-6">
+        </div>
+          <div className="flex flex-col items-center p-8 bg-white/80 dark:bg-white/5 backdrop-blur-md rounded-3xl border border-slate-200 dark:border-white/10 hover:bg-white dark:hover:bg-white/10 transition-all duration-300 hover:scale-105 hover:shadow-glow group animate-fade-in-delay-6">
             <div className="p-4 bg-gradient-to-br from-cyan-600 to-teal-600 rounded-2xl mb-6 group-hover:scale-110 transition-transform">
               <Gavel className="h-12 w-12 text-white" />
-            </div>
-            <h3 className="text-xl font-semibold mb-3 text-white drop-shadow-lg">Virtual Assistant</h3>
-            <p className="text-white/90 text-center leading-relaxed drop-shadow-md">24/7 AI assistant for clients and comprehensive case management</p>
-            <div className="mt-4 px-3 py-1 bg-white/15 text-white rounded-full text-sm font-medium">
+        </div>
+            <h3 className="text-xl font-semibold mb-3 text-slate-900 dark:text-white drop-shadow-lg">Virtual Assistant</h3>
+            <p className="text-slate-700 dark:text-white/90 text-center leading-relaxed drop-shadow-md">24/7 AI assistant for clients and comprehensive case management</p>
+            <div className="mt-4 px-3 py-1 bg-slate-100 dark:bg-white/15 text-slate-700 dark:text-white rounded-full text-sm font-medium">
               24/7 Support
             </div>
           </div>
@@ -179,21 +175,21 @@ const AnimatedIntro = () => {
 
         {/* Trust Indicators */}
         <div className="mt-16 mb-24 animate-fade-in-delay-6">
-          <p className="text-sm text-white/80 mb-4 drop-shadow-md">Trusted by leading law firms worldwide</p>
+          <p className="text-sm text-slate-600 dark:text-white/80 mb-4 drop-shadow-md">Trusted by leading law firms worldwide</p>
           <div className="flex items-center justify-center gap-8">
             <div className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-white" />
-              <span className="text-sm text-white/90 drop-shadow-sm">Bank-Level Security</span>
+              <Shield className="h-5 w-5 text-slate-700 dark:text-white" />
+              <span className="text-sm text-slate-700 dark:text-white/90 drop-shadow-sm">Bank-Level Security</span>
+              </div>
+            <div className="flex items-center gap-2">
+              <Zap className="h-5 w-5 text-slate-700 dark:text-white" />
+              <span className="text-sm text-slate-700 dark:text-white/90 drop-shadow-sm">Real-Time Processing</span>
             </div>
             <div className="flex items-center gap-2">
-              <Zap className="h-5 w-5 text-white" />
-              <span className="text-sm text-white/90 drop-shadow-sm">Real-Time Processing</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Brain className="h-5 w-5 text-white" />
-              <span className="text-sm text-white/90 drop-shadow-sm">AI-Powered</span>
-            </div>
-          </div>
+              <Brain className="h-5 w-5 text-slate-700 dark:text-white" />
+              <span className="text-sm text-slate-700 dark:text-white/90 drop-shadow-sm">AI-Powered</span>
+        </div>
+      </div>
         </div>
       </div>
     </section>
