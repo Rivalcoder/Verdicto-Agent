@@ -128,14 +128,14 @@ export async function toggleStar(conversationId: string, isStarred: boolean) {
 export async function deleteConversation(conversationId: string) {
   try {
     // Delete dependent messages first to satisfy FK constraints when CASCADE isn't configured
-    let deleteMessages = supabase
+    const deleteMessages = supabase
       .from('messages')
       .delete({ count: 'exact' })
       .eq('conversation_id', conversationId);
     const { error: msgErr } = await deleteMessages;
     if (msgErr) throw msgErr;
 
-    let deleteConversation = supabase
+    const deleteConversation = supabase
       .from('conversations')
       .delete({ count: 'exact' })
       .eq('id', conversationId);

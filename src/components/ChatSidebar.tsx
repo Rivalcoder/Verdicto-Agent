@@ -39,9 +39,9 @@ const ChatSidebar = () => {
         setConversations(data);
         if (data.length && !selectedChat) {
           setSelectedChat(data[0].id);
-          window.dispatchEvent(new CustomEvent('conversation:selected', { detail: { id: data[0].id } } as any));
+          window.dispatchEvent(new CustomEvent<{ id: string }>('conversation:selected', { detail: { id: data[0].id } }));
         }
-      } catch (e) {
+      } catch {
         // If schema missing, show empty quietly
         // Optional: console.debug('Chat list load error', e);
         setConversations([]);
@@ -51,7 +51,7 @@ const ChatSidebar = () => {
     const handler = () => load();
     window.addEventListener('conversations:updated', handler as EventListener);
     return () => window.removeEventListener('conversations:updated', handler as EventListener);
-  }, [user]);
+  }, [user, selectedChat]);
 
   const filtered = conversations.filter(c =>
     c.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -82,7 +82,7 @@ const ChatSidebar = () => {
                 const draft = await findDraftConversation(user.id);
                 if (draft) {
                   setSelectedChat(draft.id);
-                  window.dispatchEvent(new CustomEvent('conversation:selected', { detail: { id: draft.id } } as any));
+                  window.dispatchEvent(new CustomEvent<{ id: string }>('conversation:selected', { detail: { id: draft.id } }));
                 } else {
                   const created = await createConversation({
                     user_id: user.id,
@@ -94,7 +94,7 @@ const ChatSidebar = () => {
                   });
                   setConversations(prev => [created, ...prev]);
                   setSelectedChat(created.id);
-                  window.dispatchEvent(new CustomEvent('conversation:selected', { detail: { id: created.id } } as any));
+                  window.dispatchEvent(new CustomEvent<{ id: string }>('conversation:selected', { detail: { id: created.id } }));
                 }
               }}
             >
@@ -109,7 +109,7 @@ const ChatSidebar = () => {
               type="text"
               placeholder="Search conversations..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-input rounded-lg bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
@@ -148,7 +148,7 @@ const ChatSidebar = () => {
                     }`}
                     onClick={() => {
                       setSelectedChat(chat.id);
-                      window.dispatchEvent(new CustomEvent('conversation:selected', { detail: { id: chat.id } } as any));
+                      window.dispatchEvent(new CustomEvent<{ id: string }>('conversation:selected', { detail: { id: chat.id } }));
                     }}
                   >
                     <CardContent className="p-2 ">
@@ -170,7 +170,7 @@ const ChatSidebar = () => {
                               {chat.title}
                             </h4>
                             <div className="flex items-center gap-1">
-                              <button onClick={(e) => { e.stopPropagation(); onToggleStar(chat); }}>
+                              <button onClick={(e: React.MouseEvent<HTMLButtonElement>) => { e.stopPropagation(); onToggleStar(chat); }}>
                                 <Star className={`w-2.5 h-2.5 ${chat.is_starred ? 'text-yellow-500 fill-current' : ''}`} />
                               </button>
                               {Number(chat.unread_count) > 0 && (
@@ -212,7 +212,7 @@ const ChatSidebar = () => {
                   }`}
                   onClick={() => {
                     setSelectedChat(chat.id);
-                    window.dispatchEvent(new CustomEvent('conversation:selected', { detail: { id: chat.id } } as any));
+                    window.dispatchEvent(new CustomEvent<{ id: string }>('conversation:selected', { detail: { id: chat.id } }));
                   }}
                 >
                   <CardContent className="p-2">
@@ -246,11 +246,11 @@ const ChatSidebar = () => {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end" className="w-40">
-                                <DropdownMenuItem onClick={async (e) => { e.stopPropagation(); await onToggleStar(chat); }}>
+                                <DropdownMenuItem onClick={async (e: React.MouseEvent<HTMLDivElement>) => { e.stopPropagation(); await onToggleStar(chat); }}>
                                   <Star className={`h-3 w-3 mr-2 ${chat.is_starred ? 'text-yellow-500 fill-current' : ''}`} />
                                   {chat.is_starred ? 'Unfavorite' : 'Favorite'}
                                 </DropdownMenuItem>
-                                <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={async (e) => {
+                                <DropdownMenuItem className="text-destructive focus:text-destructive" onClick={async (e: React.MouseEvent<HTMLDivElement>) => {
                                   e.stopPropagation();
                                   try {
                                     await deleteConversation(chat.id);
@@ -261,7 +261,7 @@ const ChatSidebar = () => {
                                       const next = refreshed[0]?.id || null;
                                       setSelectedChat(next);
                                       if (next) {
-                                        window.dispatchEvent(new CustomEvent('conversation:selected', { detail: { id: next } } as any));
+                                        window.dispatchEvent(new CustomEvent<{ id: string }>('conversation:selected', { detail: { id: next } }));
                                       }
                                       notifyConversationsUpdated();
                                     }

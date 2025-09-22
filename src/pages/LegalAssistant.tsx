@@ -64,9 +64,11 @@ type ChatMessage = {
   isDisliked: boolean;
 };
 
+type AssistantResponse = { response?: string };
+
 const LegalAssistant = () => {
   const { user } = useAuth();
-  const [conversation, setConversation] = useState<Conversation | null>(null);
+  const [conversation, setConversation] = useState<(Partial<Conversation> & { id: string }) | null>(null);
   const [message, setMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -94,12 +96,13 @@ const LegalAssistant = () => {
 
   // Listen for conversation selection from sidebar
   useEffect(() => {
-    const handler = async (e: any) => {
-      const id = e?.detail?.id as string | undefined;
+    const handler = async (evt: Event) => {
+      const { detail } = evt as CustomEvent<{ id: string }>;
+      const id = detail?.id as string | undefined;
       if (!id || !user) return;
       try {
         const msgs = await getMessages(id);
-        setConversation({ id } as any);
+        setConversation({ id });
         setMessages([
           {
             id: 1,
@@ -220,12 +223,12 @@ const LegalAssistant = () => {
           }
           let assistantContent = 'No response received.';
           try {
-            const data = await res.json();
+            const data: unknown = await res.json();
             if (data && typeof data === 'object') {
-              const resp = (data as any).response;
+              const resp = (data as AssistantResponse).response;
               assistantContent = typeof resp === 'string' && resp.trim().length > 0 ? resp : assistantContent;
             }
-          } catch (e) {
+          } catch {
             // if body isn't JSON, show plain text
             try {
               const text = await res.text();
