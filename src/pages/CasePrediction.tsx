@@ -24,16 +24,18 @@ const CasePrediction = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
+
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     // Validate file type
     const allowedTypes = ['application/pdf', 'text/plain', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-    if (!allowedTypes.includes(file.type)) {
+    const isAllowed = allowedTypes.includes(file.type) || file.type.startsWith('image/');
+    if (!isAllowed) {
       toast({
         title: "Invalid file type",
-        description: "Please upload a PDF, DOC, DOCX, or TXT file.",
+        description: "Please upload a PDF, image, DOC, DOCX, or TXT file.",
         variant: "destructive",
       });
       return;
@@ -54,7 +56,7 @@ const CasePrediction = () => {
     setError(null);
 
     try {
-      const result = await apiService.extractTextFromDocument(file);
+      const result = await apiService.extractTextViaExtractor(file);
       if (result.success && result.extracted_text) {
         setCaseDetails(result.extracted_text);
         toast({
@@ -164,55 +166,57 @@ const CasePrediction = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 animate-fade-in-delay-1">
-        <Card className="border-0 shadow-card hover:shadow-glow transition-smooth">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Cases Analyzed</p>
-                <p className="text-2xl font-bold text-primary">1,247</p>
+      {predictionResult && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 animate-fade-in-delay-1">
+          <Card className="border-0 shadow-card hover:shadow-glow transition-smooth">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">References Found</p>
+                  <p className="text-2xl font-bold text-primary">{(predictionResult.prediction.related_records?.length ?? 0).toLocaleString()}</p>
+                </div>
+                <BarChart3 className="h-8 w-8 text-primary" />
               </div>
-              <BarChart3 className="h-8 w-8 text-primary" />
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="border-0 shadow-card hover:shadow-glow transition-smooth">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Prediction Accuracy</p>
-                <p className="text-2xl font-bold text-success">87.3%</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="border-0 shadow-card hover:shadow-glow transition-smooth">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Key Points</p>
+                  <p className="text-2xl font-bold text-success">{(predictionResult.prediction.feature_points?.length ?? 0).toLocaleString()}</p>
+                </div>
+                <Target className="h-8 w-8 text-success" />
               </div>
-              <Target className="h-8 w-8 text-success" />
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="border-0 shadow-card hover:shadow-glow transition-smooth">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Avg Settlement</p>
-                <p className="text-2xl font-bold text-secondary">$847K</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="border-0 shadow-card hover:shadow-glow transition-smooth">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Predicted Timeline</p>
+                  <p className="text-2xl font-bold text-secondary">{predictionResult.prediction.timeline}</p>
+                </div>
+                <DollarSign className="h-8 w-8 text-secondary" />
               </div>
-              <DollarSign className="h-8 w-8 text-secondary" />
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="border-0 shadow-card hover:shadow-glow transition-smooth">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">Win Rate</p>
-                <p className="text-2xl font-bold text-success">73%</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="border-0 shadow-card hover:shadow-glow transition-smooth">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Win Probability</p>
+                  <p className="text-2xl font-bold text-success">{predictionResult.prediction.probability}%</p>
+                </div>
+                <TrendingUp className="h-8 w-8 text-success" />
               </div>
-              <TrendingUp className="h-8 w-8 text-success" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Case Input Form */}
@@ -238,7 +242,7 @@ const CasePrediction = () => {
                 <Input
                   id="document-upload"
                   type="file"
-                  accept=".pdf,.doc,.docx,.txt"
+                  accept="application/pdf,image/*,.doc,.docx,.txt"
                   onChange={handleFileUpload}
                   ref={fileInputRef}
                   className="flex-1"
@@ -366,9 +370,10 @@ const CasePrediction = () => {
               </div>
             ) : (
               <Tabs defaultValue="outcome" className="space-y-4">
-                <TabsList className="grid w-full grid-cols-2">
+                <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="outcome">Outcome</TabsTrigger>
                   <TabsTrigger value="timeline">Timeline</TabsTrigger>
+                  <TabsTrigger value="references">References</TabsTrigger>
                 </TabsList>
               
               <TabsContent value="outcome" className="space-y-6">
@@ -400,7 +405,7 @@ const CasePrediction = () => {
                           <span className="font-medium">Key Analysis Points</span>
                         </div>
                         <ul className="text-sm space-y-2">
-                          {predictionResult.prediction.feature_points.map((point, index) => (
+                          {(predictionResult.prediction.feature_points ?? []).map((point, index) => (
                             <li key={index} className="flex items-start gap-2">
                               <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0"></div>
                               <span className="text-muted-foreground">{point}</span>
@@ -408,6 +413,8 @@ const CasePrediction = () => {
                           ))}
                         </ul>
                       </div>
+
+                      
                     </div>
                   </>
                 ) : (
@@ -453,6 +460,50 @@ const CasePrediction = () => {
                         <div className="text-muted-foreground">No prediction available</div>
                         <div className="text-sm text-muted-foreground">
                           Run a case prediction to see timeline analysis
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  
+                </div>
+              </TabsContent>
+
+              <TabsContent value="references" className="space-y-4">
+                <div className="space-y-6">
+                  <div className="text-center space-y-2">
+                    <h3 className="text-xl font-semibold">Reference Cases</h3>
+                    <p className="text-muted-foreground">
+                      {predictionResult ? 'Similar cases and citations relevant to your matter' : 'Links will appear here after running a prediction'}
+                    </p>
+                  </div>
+
+                  {predictionResult && predictionResult.prediction.related_records && predictionResult.prediction.related_records.length > 0 ? (
+                    <div className="p-4 rounded-lg bg-muted/50 border">
+                      <ul className="space-y-4">
+                        {predictionResult.prediction.related_records.map((rec, idx) => (
+                          <li key={idx} className="rounded-md border bg-background p-4 hover:shadow-sm transition-smooth">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="space-y-1">
+                                <a href={rec.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-medium">
+                                  {rec.title}
+                                </a>
+                                {rec.snippet && (
+                                  <p className="text-muted-foreground text-sm">{rec.snippet}</p>
+                                )}
+                              </div>
+                              <a href={rec.url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline whitespace-nowrap">Open Link</a>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : (
+                    <div className="p-4 rounded-lg bg-muted/50 border-2 border-dashed border-muted-foreground/25">
+                      <div className="text-center space-y-2">
+                        <div className="text-muted-foreground">No references yet</div>
+                        <div className="text-sm text-muted-foreground">
+                          Run a prediction to see similar cases and citations
                         </div>
                       </div>
                     </div>

@@ -9,6 +9,11 @@ export interface CasePredictionResponse {
     probability: number;
     timeline: string;
     feature_points: string[];
+    related_records?: Array<{
+      title: string;
+      url: string;
+      snippet?: string;
+    }>;
   };
 }
 
@@ -108,6 +113,74 @@ class ApiService {
     } catch (error) {
       console.error('Error extracting text from document:', error);
       throw error;
+    }
+  }
+
+  /**
+   * Uploads a document to the Rapid Extractor backend and returns extracted text.
+   * Chooses endpoint based on file type: /extract-pdf or /extract-image.
+   * The extractor base URL is read from NEXT_PUBLIC_EXTRACTOR_BASE.
+   */
+  async extractTextViaExtractor(file: File): Promise<DocumentUploadResponse> {
+    const winEnv = typeof window !== 'undefined' ? (window as unknown as { env?: Record<string, unknown> }).env : undefined;
+    const procEnv = typeof process !== 'undefined' ? (process as unknown as { env?: Record<string, unknown> }).env : undefined;
+    const configuredBase = [winEnv?.NEXT_PUBLIC_EXTRACTOR_BASE, procEnv?.NEXT_PUBLIC_EXTRACTOR_BASE]
+      .find((v): v is unknown => typeof v !== 'undefined');
+    const extractorBase = (typeof configuredBase === 'string' ? configuredBase : undefined)
+      || 'https://Rivalcoder-Rapid-Extractor.hf.space';
+
+    const isPdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+    const isImage = file.type.startsWith('image/') || /(png|jpe?g|webp|gif|bmp|tiff)$/i.test(file.name);
+    const path = isPdf ? '/extract-pdf' : (isImage ? '/extract-image' : '/extract-pdf');
+    const url = `${extractorBase.replace(/\/$/, '')}${path}`;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await fetch(url, { method: 'POST', body: formData });
+      const rawText = await response.text();
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(rawText);
+      } catch {
+        parsed = { raw: rawText } as const;
+      }
+
+      // Attempt to find extracted text in common fields safely
+      const extracted = (() => {
+        if (typeof parsed === 'string') return parsed;
+        if (typeof (parsed as { extracted_text?: unknown }).extracted_text === 'string') {
+          return (parsed as { extracted_text: string }).extracted_text;
+        }
+        if (typeof (parsed as { text?: unknown }).text === 'string') {
+          return (parsed as { text: string }).text;
+        }
+        if (typeof (parsed as { content?: unknown }).content === 'string') {
+          return (parsed as { content: string }).content;
+        }
+        const maybeData = (parsed as { data?: { text?: unknown } }).data;
+        if (maybeData && typeof maybeData.text === 'string') {
+          return maybeData.text;
+        }
+        if (typeof (parsed as { raw?: unknown }).raw === 'string') {
+          return (parsed as { raw: string }).raw;
+        }
+        return '';
+      })();
+
+      if (!response.ok) {
+        return { success: false, error: `HTTP ${response.status}: ${extracted?.slice?.(0, 200) || 'Extractor error'}` };
+      }
+
+      if (typeof extracted !== 'string' || extracted.trim().length === 0) {
+        return { success: false, error: 'No text extracted from document' };
+      }
+
+      return { success: true, extracted_text: extracted };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Network error';
+      return { success: false, error: message };
     }
   }
 
