@@ -51,10 +51,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setLoading(false);
         
         if (event === 'SIGNED_IN') {
-          toast({
-            title: "Welcome back!",
-            description: "You have successfully signed in.",
-          });
+          const hasWelcomed = typeof window !== 'undefined' && sessionStorage.getItem('welcomed') === 'true';
+          if (!hasWelcomed) {
+            toast({
+              title: "Welcome back!",
+              description: "You have successfully signed in.",
+            });
+            if (typeof window !== 'undefined') sessionStorage.setItem('welcomed', 'true');
+          }
         }
       }
     );
@@ -118,6 +122,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    if (typeof window !== 'undefined') sessionStorage.removeItem('welcomed');
     toast({
       title: "Signed Out",
       description: "You have been successfully signed out.",

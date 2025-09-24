@@ -212,10 +212,21 @@ const LegalAssistant = () => {
       // Call Assistant API (RAG)
       (async () => {
         try {
+          const historyPayload = [...messages, newMessage]
+            .filter(m => !(m.id === 1 && m.type === 'assistant'))
+            .map(m => ({
+              role: m.type === 'user' ? 'user' : 'assistant',
+              content: m.content,
+            }));
+
           const res = await fetch('/api/assistant', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query: newMessage.content })
+            body: JSON.stringify({
+              query: newMessage.content,
+              chatId: conversation?.id,
+              history: historyPayload,
+            })
           });
           if (!res.ok) {
             const text = await res.text();
@@ -379,10 +390,10 @@ const LegalAssistant = () => {
                       </Avatar>
                     )}
                     <div className={`group relative ${msg.type === 'user' ? 'flex-row-reverse' : ''}`}>
-                      <div className={`rounded-2xl p-4 shadow-sm transition-all duration-300 hover:shadow-md ${
-                        msg.type === 'user' 
-                          ? 'bg-primary text-primary-foreground ml-auto' 
-                          : 'bg-card border border-border'
+                      <div className={`p-4 transition-all duration-300 ${
+                        msg.type === 'user'
+                          ? 'bg-indigo-500 dark:bg-indigo-600 text-white ml-auto shadow-md hover:shadow-lg rounded-2xl rounded-br-md hover:ring-1 hover:ring-indigo-400 dark:hover:ring-indigo-500'
+                          : 'bg-zinc-100 dark:bg-zinc-800 text-foreground border border-zinc-200 dark:border-zinc-700 shadow-sm hover:shadow-md rounded-2xl rounded-bl-md hover:ring-1 hover:ring-zinc-300 dark:hover:ring-zinc-600'
                       }`}>
                         {msg.type === 'assistant' ? (
                           <div className="text-sm leading-relaxed prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: markdownToHtml(String(msg.content || '')) }} />
@@ -390,7 +401,7 @@ const LegalAssistant = () => {
                           <p className="text-sm leading-relaxed whitespace-pre-wrap">{String(msg.content || '')}</p>
                         )}
                         <div className={`flex items-center justify-between mt-2 ${
-                          msg.type === 'user' ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                          msg.type === 'user' ? 'text-white/80' : 'text-muted-foreground'
                         }`}>
                           <span className="text-xs">{msg.timestamp}</span>
                           {msg.type === 'assistant' && (

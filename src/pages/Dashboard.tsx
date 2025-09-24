@@ -15,7 +15,10 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 
+import { useRouter } from "next/navigation";
+
 const Dashboard = () => {
+  const router = useRouter();
   const stats = [
     {
       title: "Contracts Analyzed",
@@ -96,7 +99,7 @@ const Dashboard = () => {
       title: "Predict Case Outcome",
       description: "Run predictive analysis on your case",
       icon: TrendingUp,
-      action: "/dashboard/prediction",
+      action: "/dashboard/predictions",
       color: "bg-primary-dark"
     }
   ];
@@ -167,7 +170,11 @@ const Dashboard = () => {
                   <p className="text-sm text-muted-foreground mb-4">
                     {action.description}
                   </p>
-                  <Button variant="ghost" className="w-full group-hover:bg-accent">
+                  <Button
+                    variant="ghost"
+                    className="w-full group-hover:bg-accent"
+                    onClick={() => router.push(action.action)}
+                  >
                     Get Started
                     <ArrowUpRight className="ml-2 h-4 w-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                   </Button>

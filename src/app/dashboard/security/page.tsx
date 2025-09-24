@@ -23,28 +23,28 @@ export default function SecurityPage() {
       action: "Password changed",
       timestamp: "2024-01-20 14:30",
       status: "success",
-      location: "New York, NY"
+      location: "Chennai, Tamil Nadu"
     },
     {
       id: 2,
       action: "Login from new device",
       timestamp: "2024-01-19 09:15",
       status: "warning",
-      location: "San Francisco, CA"
+      location: "Chennai, Tamil Nadu"
     },
     {
       id: 3,
       action: "Two-factor authentication enabled",
       timestamp: "2024-01-18 16:45",
       status: "success",
-      location: "New York, NY"
+      location: "Chennai, Tamil Nadu"
     },
     {
       id: 4,
       action: "Failed login attempt",
       timestamp: "2024-01-17 22:10",
       status: "error",
-      location: "Unknown"
+      location: "Chennai, Tamil Nadu"
     }
   ];
 

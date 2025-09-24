@@ -39,7 +39,7 @@ const mainItems = [
 const toolsItems = [
   { title: "Document Library", url: "/dashboard/documents", icon: FileText },
   { title: "Legal Research", url: "/dashboard/research", icon: Search },
-  { title: "Client Management", url: "/dashboard/clients", icon: Users },
+  { title: "Counsel", url: "/dashboard/clients", icon: Users },
   { title: "Calendar", url: "/dashboard/calendar", icon: Calendar },
   { title: "Archive", url: "/dashboard/archive", icon: Archive },
 ];

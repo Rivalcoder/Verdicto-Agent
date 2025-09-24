@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Users, Search, Plus, Phone, Mail, Calendar, FileText } from "lucide-react";
+import { Users, Search, Plus, Phone, Mail, Calendar, Shield, Briefcase, Clock } from "lucide-react";
 
 export default function ClientsPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -14,33 +14,39 @@ export default function ClientsPage() {
   const clients = [
     {
       id: 1,
-      name: "John Smith",
-      email: "john.smith@email.com",
-      phone: "+1 (555) 123-4567",
-      company: "Smith & Associates",
-      status: "Active",
-      cases: 3,
-      lastContact: "2024-01-15"
+      name: "Adv. Priya Mehta",
+      email: "priya.mehta@bar.in",
+      phone: "+91 98765 43210",
+      company: "Independent Counsel",
+      status: "Verified",
+      specialty: "Contract & Corporate",
+      experience: 8,
+      barId: "DL/2015/23456",
+      lastActive: "Online"
     },
     {
       id: 2,
-      name: "Sarah Johnson",
-      email: "sarah.j@techcorp.com",
-      phone: "+1 (555) 987-6543",
-      company: "TechCorp Inc.",
-      status: "Active",
-      cases: 1,
-      lastContact: "2024-01-14"
+      name: "Adv. Rahul Verma",
+      email: "rahul.verma@bar.in",
+      phone: "+91 99887 76655",
+      company: "Verma Chambers",
+      status: "Verified",
+      specialty: "IP & Technology",
+      experience: 11,
+      barId: "MH/2012/11223",
+      lastActive: "5 min ago"
     },
     {
       id: 3,
-      name: "Michael Brown",
-      email: "m.brown@startup.io",
-      phone: "+1 (555) 456-7890",
-      company: "StartupIO",
-      status: "Prospect",
-      cases: 0,
-      lastContact: "2024-01-10"
+      name: "Adv. Sneha Kulkarni",
+      email: "sneha.kulkarni@bar.in",
+      phone: "+91 90909 80808",
+      company: "Kulkarni & Co.",
+      status: "Verified",
+      specialty: "Civil & Arbitration",
+      experience: 6,
+      barId: "KA/2017/55667",
+      lastActive: "Yesterday"
     }
   ];
 
@@ -48,12 +54,12 @@ export default function ClientsPage() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Client Management</h1>
-          <p className="text-muted-foreground">Manage your clients and their cases</p>
+          <h1 className="text-3xl font-bold text-foreground">Counsel</h1>
+          <p className="text-muted-foreground">Connect with verified legal professionals for quick doubts and consultations</p>
         </div>
         <Button className="bg-gradient-primary text-white">
           <Plus className="mr-2 h-4 w-4" />
-          Add Client
+          New Conversation
         </Button>
       </div>
 
@@ -61,7 +67,7 @@ export default function ClientsPage() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search clients..."
+            placeholder="Search counsel (name, specialty, bar ID)..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -69,7 +75,7 @@ export default function ClientsPage() {
         </div>
         <Button variant="outline">
           <Users className="mr-2 h-4 w-4" />
-          All Clients
+          All Counsel
         </Button>
       </div>
 
@@ -87,10 +93,12 @@ export default function ClientsPage() {
                   </Avatar>
                   <div>
                     <CardTitle className="text-lg">{client.name}</CardTitle>
-                    <CardDescription>{client.company}</CardDescription>
+                    <CardDescription className="flex items-center gap-2">
+                      <Briefcase className="h-3.5 w-3.5" /> {client.specialty}
+                    </CardDescription>
                   </div>
                 </div>
-                <Badge variant={client.status === "Active" ? "default" : "secondary"}>
+                <Badge variant={client.status === "Verified" ? "default" : "secondary"}>
                   {client.status}
                 </Badge>
               </div>
@@ -106,20 +114,27 @@ export default function ClientsPage() {
                   {client.phone}
                 </div>
                 <div className="flex items-center gap-2 text-muted-foreground">
-                  <FileText className="h-4 w-4" />
-                  {client.cases} active cases
+                  <Shield className="h-4 w-4" />
+                  Bar ID: {client.barId}
                 </div>
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Calendar className="h-4 w-4" />
-                  Last contact: {client.lastContact}
+                  Experience: {client.experience} years
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Clock className="h-4 w-4" />
+                  Last active: {client.lastActive}
                 </div>
               </div>
-              <div className="flex gap-2">
-                <Button size="sm" variant="outline" className="flex-1">
-                  View Profile
+              <div className="grid grid-cols-3 gap-2">
+                <Button size="sm" variant="outline">
+                  Chat
                 </Button>
-                <Button size="sm" variant="outline" className="flex-1">
-                  Contact
+                <Button size="sm" variant="outline">
+                  Call
+                </Button>
+                <Button size="sm" variant="outline">
+                  Schedule
                 </Button>
               </div>
             </CardContent>

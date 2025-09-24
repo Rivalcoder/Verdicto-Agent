@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { FileSearch, Upload, AlertTriangle, CheckCircle, Clock, TrendingUp, X } from "lucide-react";
 import { apiService, type ContractAnalysisResponse } from "@/services/api";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const ContractAnalyzer = () => {
   const [analysisProgress, setAnalysisProgress] = useState(0);
@@ -19,6 +20,10 @@ const ContractAnalyzer = () => {
   const [error, setError] = useState<string | null>(null);
   const [isHealthCheckPassed, setIsHealthCheckPassed] = useState<boolean | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isClauseOpen, setIsClauseOpen] = useState(false);
+  const [selectedClause, setSelectedClause] = useState<ContractAnalysisResponse["clauses"][number] | null>(null);
+  const [isRiskOpen, setIsRiskOpen] = useState(false);
+  const [selectedRisk, setSelectedRisk] = useState<ContractAnalysisResponse["clauses"][number]["risks"][number] | null>(null);
 
   const checkServiceHealth = async () => {
     try {
@@ -97,16 +102,27 @@ const ContractAnalyzer = () => {
     }
   };
 
-  const getRiskLevel = (score: number) => {
-    if (score >= 7) return { level: 'High', variant: 'destructive' as const, color: 'text-destructive' };
-    if (score >= 4) return { level: 'Medium', variant: 'secondary' as const, color: 'text-warning' };
-    return { level: 'Low', variant: 'outline' as const, color: 'text-success' };
+  type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline';
+  const getRiskLevel = (score: number): { level: 'High' | 'Medium' | 'Low'; variant: BadgeVariant; color: string } => {
+    if (score >= 7) return { level: 'High', variant: 'destructive', color: 'text-destructive' };
+    if (score >= 4) return { level: 'Medium', variant: 'secondary', color: 'text-warning' };
+    return { level: 'Low', variant: 'outline', color: 'text-success' };
   };
 
   const getOverallRiskLevel = (score: number) => {
     if (score >= 7) return { level: 'High', variant: 'destructive' as const };
     if (score >= 4) return { level: 'Medium', variant: 'secondary' as const };
     return { level: 'Low', variant: 'outline' as const };
+  };
+
+  const clampScore = (n: number) => Math.min(10, Math.max(0, n));
+
+  const computeOverallScore = (res: ContractAnalysisResponse): number => {
+    const provided = typeof res.final_risk_score === 'number' ? res.final_risk_score : 0;
+    const allScores = res.clauses?.flatMap(c => c.risks?.map(r => r.score) || []) || [];
+    if (allScores.length === 0) return clampScore(provided);
+    const avg = allScores.reduce((a, b) => a + b, 0) / allScores.length;
+    return clampScore(Number(avg.toFixed(1)));
   };
 
   return (
@@ -195,7 +211,7 @@ const ContractAnalyzer = () => {
               <div>
                 <p className="text-sm text-muted-foreground">Overall Risk Score</p>
                 <p className="text-2xl font-bold text-secondary">
-                  {analysisResult ? `${analysisResult.final_risk_score}/10` : 'N/A'}
+                  {analysisResult ? `${computeOverallScore(analysisResult)}/10` : 'N/A'}
                 </p>
               </div>
               <TrendingUp className="h-8 w-8 text-secondary" />
@@ -262,13 +278,22 @@ const ContractAnalyzer = () => {
             </div>
             
             {selectedFile && (
-              <Button 
-                onClick={handleFileUpload} 
-                className="w-full bg-gradient-primary"
-                disabled={isAnalyzing}
-              >
-                {isAnalyzing ? 'Analyzing...' : 'Analyze Contract'}
-              </Button>
+              <div className="grid grid-cols-2 gap-2">
+                <Button 
+                  onClick={handleFileUpload} 
+                  className="w-full bg-gradient-primary"
+                  disabled={isAnalyzing}
+                >
+                  {isAnalyzing ? 'Analyzing...' : 'Analyze Contract'}
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={clearAnalysis}
+                  disabled={isAnalyzing}
+                >
+                  Clear
+                </Button>
+              </div>
             )}
             
             {isAnalyzing && (
@@ -306,11 +331,11 @@ const ContractAnalyzer = () => {
                       <span className="text-sm font-medium">Overall Risk Score</span>
                       <div className="flex items-center gap-2">
                         <div className={`w-3 h-3 rounded-full ${
-                          analysisResult.final_risk_score >= 7 ? 'bg-destructive' : 
-                          analysisResult.final_risk_score >= 4 ? 'bg-warning' : 'bg-success'
+                          computeOverallScore(analysisResult) >= 7 ? 'bg-destructive' : 
+                          computeOverallScore(analysisResult) >= 4 ? 'bg-warning' : 'bg-success'
                         }`}></div>
-                        <Badge variant={getOverallRiskLevel(analysisResult.final_risk_score).variant} className="font-semibold">
-                          {getOverallRiskLevel(analysisResult.final_risk_score).level} ({analysisResult.final_risk_score}/10)
+                        <Badge variant={getOverallRiskLevel(computeOverallScore(analysisResult)).variant} className="font-semibold">
+                          {getOverallRiskLevel(computeOverallScore(analysisResult)).level} ({computeOverallScore(analysisResult)}/10)
                         </Badge>
                       </div>
                     </div>
@@ -334,17 +359,21 @@ const ContractAnalyzer = () => {
                 </TabsContent>
                 
                 <TabsContent value="risks" className="space-y-3">
-                  <div className="space-y-3">
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
                     {analysisResult.clauses.flatMap(clause => clause.risks).length > 0 ? (
                       analysisResult.clauses.flatMap(clause => 
                         clause.risks.map(risk => ({ ...risk, clauseNumber: clause.clause_number }))
                       ).map((risk, index) => {
                         const riskLevel = getRiskLevel(risk.score);
                         return (
-                          <div key={index} className={`flex items-start gap-3 p-3 rounded-lg border ${
-                            risk.score >= 7 ? 'bg-destructive/5 border-destructive/20' : 
-                            risk.score >= 4 ? 'bg-warning/5 border-warning/20' : 'bg-success/5 border-success/20'
-                          }`}>
+                          <div
+                            key={index}
+                            className={`flex items-start gap-3 p-3 rounded-lg border cursor-pointer ${
+                              risk.score >= 7 ? 'bg-destructive/5 border-destructive/20' : 
+                              risk.score >= 4 ? 'bg-warning/5 border-warning/20' : 'bg-success/5 border-success/20'
+                            }`}
+                            onClick={() => { setSelectedRisk(risk); setIsRiskOpen(true); }}
+                          >
                             <AlertTriangle className={`h-4 w-4 mt-0.5 ${riskLevel.color}`} />
                             <div className="flex-1">
                               <p className="text-sm font-medium">
@@ -375,7 +404,11 @@ const ContractAnalyzer = () => {
                 <TabsContent value="clauses" className="space-y-3">
                   <div className="space-y-2 max-h-96 overflow-y-auto">
                     {analysisResult.clauses.map((clause, index) => (
-                      <div key={index} className="p-3 rounded-lg bg-muted/30 border border-muted-foreground/10 hover:bg-muted/40 transition-colors">
+                      <div
+                        key={index}
+                        className="p-3 rounded-lg bg-muted/30 border border-muted-foreground/10 hover:bg-muted/40 transition-colors cursor-pointer"
+                        onClick={() => { setSelectedClause(clause); setIsClauseOpen(true); }}
+                      >
                         <div className="flex justify-between items-start mb-2">
                           <span className="text-sm font-medium">Clause {clause.clause_number}</span>
                           <Badge variant={clause.risks.length > 0 ? "destructive" : "outline"}>
@@ -405,6 +438,49 @@ const ContractAnalyzer = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Clause Detail Dialog */}
+      <Dialog open={isClauseOpen} onOpenChange={setIsClauseOpen}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{selectedClause ? `Clause ${selectedClause.clause_number}` : 'Clause Details'}</DialogTitle>
+          </DialogHeader>
+          {selectedClause && (
+            <div className="space-y-4">
+              <div className="p-3 rounded border bg-muted/20 text-sm max-h-[50vh] overflow-auto whitespace-pre-wrap">
+                {selectedClause.text}
+              </div>
+              {selectedClause.suggestion && (
+                <div className="p-3 rounded border bg-muted/30 text-sm">
+                  <strong>Suggestion:</strong> {selectedClause.suggestion}
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Risk Detail Dialog */}
+      <Dialog open={isRiskOpen} onOpenChange={setIsRiskOpen}>
+        <DialogContent className="sm:max-w-xl">
+          <DialogHeader>
+            <DialogTitle>{selectedRisk ? selectedRisk.risk_id : 'Risk Details'}</DialogTitle>
+          </DialogHeader>
+          {selectedRisk && (
+            <div className="space-y-3 text-sm">
+              <div className="flex items-center justify-between">
+                <span className="font-medium">Level</span>
+                <Badge variant={getRiskLevel(selectedRisk.score).variant}>
+                  {getRiskLevel(selectedRisk.score).level} ({clampScore(selectedRisk.score)}/10)
+                </Badge>
+              </div>
+              <div className="p-3 rounded border bg-muted/20 whitespace-pre-wrap">
+                {selectedRisk.description}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
