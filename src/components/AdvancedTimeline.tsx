@@ -15,6 +15,7 @@ import {
   Play,
   CheckCircle
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface TimelineItem {
   id: string;
@@ -78,7 +79,7 @@ const timelineData: TimelineItem[] = [
 export function AdvancedTimeline() {
   const [visibleItems, setVisibleItems] = useState<Set<string>>(new Set());
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
-
+  const router = useRouter(); // added router to use for routing to signup page
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -300,6 +301,7 @@ export function AdvancedTimeline() {
                 <div className="flex justify-center items-center pt-4">
                   <Button 
                     size="lg" 
+                    onClick={() => router.push('/auth')}
                     className="group relative px-12 py-6 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 text-white rounded-full font-bold text-xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110 overflow-hidden hover-glow-enhanced"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />

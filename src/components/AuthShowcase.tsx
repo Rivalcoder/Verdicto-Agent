@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Scale, Shield, Zap, Brain, CheckCircle, ArrowRight, Sparkles, Users, Clock, Award } from 'lucide-react';
+import { Scale, Shield, Zap, Brain, CheckCircle, Users, Clock, Award } from 'lucide-react';
 
 const AuthShowcase = () => {
   const [currentFeature, setCurrentFeature] = useState(0);
@@ -143,11 +143,7 @@ const AuthShowcase = () => {
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
               Join thousands of legal professionals who trust Verdicto
             </p>
-            <div className="flex items-center justify-center gap-2 text-xs text-gray-500 dark:text-gray-500">
-              <Sparkles className="w-3 h-3" />
-              <span>Start your free trial today</span>
-              <ArrowRight className="w-3 h-3" />
-            </div>
+           
           </div>
         </div>
       </div>

@@ -17,7 +17,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
-const Navigation = () => {
+type NavigationProps = {
+  forceSolid?: boolean;
+};
+
+const Navigation = ({ forceSolid = false }: NavigationProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { user, signOut } = useAuth();
@@ -42,10 +46,12 @@ const Navigation = () => {
     return email.split('@')[0].substring(0, 2).toUpperCase();
   };
 
+  const solid = forceSolid || isScrolled;
+
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      isScrolled 
-        ? 'bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-border/50 shadow-lg' 
+      solid 
+        ? 'bg-white dark:bg-slate-900 border-b border-border/50 shadow-lg' 
         : 'bg-transparent backdrop-blur-none border-b-0 shadow-none'
     }`}>
       <div className="max-w-7xl mx-auto px-6">
@@ -56,7 +62,7 @@ const Navigation = () => {
               <Scale className="h-6 w-6 text-white" />
             </div>
             <span className={`text-2xl font-bold transition-all duration-300 ${
-              isScrolled 
+              solid 
                 ? 'bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent drop-shadow-lg' 
                 : 'bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent drop-shadow-lg'
             }`}>
@@ -109,7 +115,7 @@ const Navigation = () => {
                   asChild 
                   variant="outline" 
                   className={`font-medium transition-all duration-200 hover:scale-105 ${
-                    isScrolled 
+                    solid 
                       ? 'bg-background/80 border-border hover:bg-accent backdrop-blur-sm text-foreground' 
                       : 'bg-transparent border-transparent hover:bg-primary/10 text-primary shadow-none'
                   }`}
@@ -119,7 +125,7 @@ const Navigation = () => {
                 <Button 
                   asChild 
                   className={`font-medium px-6 transition-all duration-200 hover:scale-105  ${
-                    isScrolled 
+                    solid 
                       ? 'bg-gradient-primary text-white shadow-lg hover:shadow-xl' 
                       : 'bg-gradient-primary text-white shadow-2xl hover:shadow-2xl'
                   }`}
@@ -135,7 +141,7 @@ const Navigation = () => {
             <ThemeToggle />
             <button
               className={`p-2 rounded-lg transition-all duration-200 hover:scale-105 ${
-                isScrolled 
+                solid 
                   ? 'text-foreground hover:bg-accent' 
                   : 'text-primary hover:bg-primary/10'
               }`}
@@ -154,7 +160,7 @@ const Navigation = () => {
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className={`md:hidden animate-fade-in transition-all duration-300 ${
-            isScrolled 
+            solid 
               ? 'bg-background/95 backdrop-blur-md border-t border-border' 
               : 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-border/50'
           }`}>

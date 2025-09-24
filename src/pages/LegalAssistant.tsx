@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
@@ -72,6 +73,7 @@ const LegalAssistant = () => {
   const [message, setMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   
@@ -342,27 +344,47 @@ const LegalAssistant = () => {
 
 
   return (
-    <div className="h-screen flex bg-background overflow-hidden relative">
-      {/* Right Sidebar - Chat History */}
-      <div className="w-80 flex flex-col h-full bg-card shadow-lg">
+    <div className="h-[100svh] flex bg-background overflow-hidden relative">
+      {/* Sidebar - hidden on mobile */}
+      <div className="hidden lg:flex w-80 flex-col h-full bg-card shadow-lg">
         <ChatSidebar />
       </div>
       
-      {/* Animated Divider Line - Between Chat and History */}
-      <div className="absolute left-80 top-0 bottom-0 w-1 divider-line divider-glow z-10"></div>
+      {/* Animated Divider Line - Between Chat and History (desktop only) */}
+      <div className="hidden lg:block absolute left-80 top-0 bottom-0 w-1 divider-line divider-glow z-10"></div>
       
       {/* Main Chat Interface */}
       <div className="flex-1 flex flex-col h-full">
+        {/* Mobile Chat History Sheet */}
+        <Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
+          <SheetContent side="left" className="w-[85vw] max-w-sm p-0 [&>button]:hidden">
+            <SheetTitle className="sr-only">Chat history</SheetTitle>
+            <SheetDescription className="sr-only">Previous conversations</SheetDescription>
+            <ChatSidebar />
+          </SheetContent>
+        </Sheet>
+
         {/* Header */}
         <div className="p-4 border-b border-border bg-card/50 backdrop-blur-sm flex-shrink-0">
           <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <h1 className="text-xl font-bold text-foreground">
-                Virtual Legal Assistant
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                24/7 AI-powered legal assistance
-              </p>
+            <div className="flex items-center gap-3">
+              {/* Mobile: open chat history */}
+              <Button
+                variant="outline"
+                size="sm"
+                className="lg:hidden"
+                onClick={() => setMobileSidebarOpen(true)}
+              >
+                History
+              </Button>
+              <div className="space-y-1">
+                <h1 className="text-xl font-bold text-foreground">
+                  Virtual Legal Assistant
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  24/7 AI-powered legal assistance
+                </p>
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>

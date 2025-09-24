@@ -1,12 +1,37 @@
 "use client";
 
+import { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ArrowRight, Brain, FileSearch, Gavel, Sparkles, Zap, Shield } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import heroBg from "@/assets/hero-bg-enhanced.jpg";
 
 const HeroSection = () => {
+  const [isDemoOpen, setIsDemoOpen] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  useEffect(() => {
+    if (isDemoOpen && videoRef.current) {
+      // Guarantee muted before attempting autoplay (required on many browsers)
+      videoRef.current.muted = true;
+      videoRef.current.currentTime = 0;
+      const playPromise = videoRef.current.play();
+      if (playPromise) {
+        playPromise.catch(() => {
+          if (videoRef.current) {
+            // Retry once more
+            videoRef.current.play().catch(() => {});
+          }
+        });
+      }
+    } else if (!isDemoOpen && videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+    }
+  }, [isDemoOpen]);
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Enhanced Animated Background */}
@@ -95,6 +120,7 @@ const HeroSection = () => {
           <Button 
             size="lg" 
             variant="outline"
+            onClick={() => setIsDemoOpen(true)}
             className="bg-white/20 dark:bg-white/10 border-white/50 dark:border-white/30 text-white hover:bg-white/30 dark:hover:bg-white/20 px-8 py-4 text-lg font-semibold backdrop-blur-sm transition-all duration-300 hover:scale-105 group shadow-lg hover-glow-enhanced"
           >
             <Zap className="mr-2 h-5 w-5 group-hover:rotate-12 transition-transform" />
@@ -135,7 +161,28 @@ const HeroSection = () => {
             <div className="mt-4 px-3 py-1 bg-primary/20 text-primary-light rounded-full text-sm font-medium">
               AI Assistant
             </div>
+      </div>
+
+      {/* Demo Video Dialog */}
+      <Dialog open={isDemoOpen} onOpenChange={setIsDemoOpen}>
+        <DialogContent className="max-w-4xl w-[95vw] p-0 overflow-hidden bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border border-white/20 dark:border-white/10">
+          <DialogHeader className="px-4 pt-4 pb-2">
+            <DialogTitle className="text-slate-900 dark:text-white">Platform Demo</DialogTitle>
+          </DialogHeader>
+          <div className="relative aspect-video w-full bg-black">
+            <video
+              ref={videoRef}
+              className="w-full h-full"
+              src="/demo.mp4"
+              controls
+              autoPlay
+              muted
+              playsInline
+              preload="auto"
+            />
           </div>
+        </DialogContent>
+      </Dialog>
         </div>
 
         {/* Trust Indicators */}

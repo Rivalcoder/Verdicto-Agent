@@ -1,9 +1,37 @@
+"use client"
 import Navigation from "@/components/Navigation";
+import React from "react";
 import { AdvancedTimeline } from "@/components/AdvancedTimeline";
 import AnimatedIntro from "@/components/AnimatedIntro";
 import AnimatedFeatures from "@/components/AnimatedFeatures";
 
 export default function Home() {
+  // Ensure landing loads at top
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+    }
+  }, []);
+
+  // Deterministic pseudo-random generator to avoid SSR/CSR mismatches
+  const seededRandom = (seed: number) => {
+    const x = Math.sin(seed) * 10000;
+    return x - Math.floor(x);
+  };
+
+  const orbPositions = React.useMemo(
+    () => Array.from({ length: 8 }).map((_, i) => {
+      const left = seededRandom(i * 2.13 + 0.73) * 100;
+      const top = seededRandom(i * 3.57 + 1.19) * 100;
+      return {
+        left: `${left.toFixed(4)}%`,
+        top: `${top.toFixed(4)}%`,
+        delay: `${(i * 1.5).toFixed(1)}s`,
+        duration: `${15 + i * 2}s`,
+      };
+    }),
+    []
+  );
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Modern Background with Enhanced Animations */}
@@ -11,7 +39,7 @@ export default function Home() {
         {/* Enhanced Animated Background Elements */}
         <div className="absolute inset-0">
           {/* Dynamic Floating Orbs */}
-          {[...Array(8)].map((_, i) => (
+          {orbPositions.map((pos, i) => (
             <div
               key={i}
               className={`absolute rounded-full blur-3xl animate-float-gentle ${
@@ -21,10 +49,10 @@ export default function Home() {
                 'w-64 h-64 bg-gradient-to-r from-indigo-400/20 to-purple-400/20'
               }`}
               style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${i * 1.5}s`,
-                animationDuration: `${15 + i * 2}s`,
+                left: pos.left,
+                top: pos.top,
+                animationDelay: pos.delay,
+                animationDuration: pos.duration,
               }}
             />
           ))}
@@ -37,13 +65,13 @@ export default function Home() {
         </div>
       </div>
       
-      {/* Enhanced Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/5 to-background/40 z-5" />
+      {/* Enhanced Gradient Overlay - start from navbar bg to avoid color band */}
+      <div className="absolute inset-0 bg-gradient-to-b from-white dark:from-slate-900 via-background/5 to-background/40 z-[5]" />
       
       <div className="relative z-10">
-        <Navigation />
-        {/* Improved spacing with proper navbar offset */}
-        <main className="pt-20">
+        <Navigation forceSolid />
+        {/* Spacing matches navbar height (h-16) */}
+        <main className="pt-16">
           <AnimatedIntro />
           <AnimatedFeatures />
           <AdvancedTimeline />
