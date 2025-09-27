@@ -142,7 +142,7 @@ ${caseDetails}
         if (isObject(mod) && typeof (mod as Record<string, unknown>).google === 'function') {
           const { google } = mod as { google: (modelName: string) => unknown };
           const { object } = await generateObject({
-            model: google('gemini-2.5-flash') as unknown as LanguageModel,
+            model: google('gemini-2.5-flash-lite') as unknown as LanguageModel,
             schema,
             prompt: indianLegalPrompt,
           });
@@ -151,7 +151,7 @@ ${caseDetails}
           const { createGoogleGenerativeAI } = mod as { createGoogleGenerativeAI: (opts: { apiKey: string }) => (modelName: string) => unknown };
           const google = createGoogleGenerativeAI({ apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY || '' });
           const { object } = await generateObject({
-            model: google('gemini-2.5-flash') as unknown as LanguageModel,
+            model: google('gemini-2.5-flash-lite') as unknown as LanguageModel,
             schema,
             prompt: indianLegalPrompt,
           });
