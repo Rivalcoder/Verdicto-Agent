@@ -11,10 +11,10 @@ import {
   BarChart3,
   FileText,
   Users,
-  Calendar,
   Search,
-  Archive,
-  Scale
+  Scale,
+  Brain,
+  BookOpen
 } from "lucide-react";
 
 import {
@@ -38,10 +38,10 @@ const mainItems = [
 
 const toolsItems = [
   { title: "Document Library", url: "/dashboard/documents", icon: FileText },
-  { title: "Legal Research", url: "/dashboard/research", icon: Search },
-  { title: "Counsel", url: "/dashboard/clients", icon: Users },
-  { title: "Calendar", url: "/dashboard/calendar", icon: Calendar },
-  { title: "Archive", url: "/dashboard/archive", icon: Archive },
+  { title: "Legal Research", url: "/dashboard/archive", icon: Search },
+  { title: "Counsel Network", url: "/dashboard/clients", icon: Users },
+  { title: "Case Analysis", url: "/dashboard/calendar", icon: Brain },
+  { title: "Deep Think", url: "/dashboard/deep-think", icon: BookOpen },
 ];
 
 const systemItems = [
