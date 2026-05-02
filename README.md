@@ -11,7 +11,6 @@
 </p>
 
 ---
-
 ### ✨ What you get (at a glance)
 
 <table>
